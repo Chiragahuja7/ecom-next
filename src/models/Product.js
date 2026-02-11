@@ -9,7 +9,13 @@ const ProductSchema = new mongoose.Schema(
     },
     description: String,
     price: Number,
-    images: [String],
+    oldPrice: Number,
+    images: [
+      {
+        url: String,
+        public_id: String,
+      },
+    ],
     category: String,
     stock: Number,
   },

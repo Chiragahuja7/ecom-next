@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Header(){
     return(
@@ -17,13 +18,13 @@ export default function Header(){
                     Cart
                 </div>
             </div>
-            <nav className="hidden md:flex">
+            <nav className="hidden md:flex border-t border-white/20">
                 <ul className="flex justify-left items-center gap-8 mt-4 ms-5">
-                    <li className="hover:text-orange-600 hover:underline cursor-pointer">Home</li>
-                    <li className="hover:text-orange-600 hover:underline cursor-pointer">Shop</li>
+                    <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/">Home</Link>
+                    <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/shop">Shop</Link>
                     <li className="hover:text-orange-600 hover:underline cursor-pointer">💪HEALTH KITS💪</li>
                     <li className="hover:text-orange-600 hover:underline cursor-pointer">Migraine Kit</li>
-                    <li className="hover:text-orange-600 hover:underline cursor-pointer">Contact Us</li>
+                    <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/contactus">Contact Us</Link>
                 </ul>
             </nav>
         </header>
