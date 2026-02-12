@@ -38,6 +38,15 @@ export const products = [
             discount: "-20%",
             img: "https://refineveda.com/cdn/shop/files/AppleCider-Photoroom.jpg?v=1761897280&width=720",
             hoverImg: "https://refineveda.com/cdn/shop/files/1_fa098206-3b4d-4af3-bff7-c1e7af954ad9.png?v=1762513930&width=720"
+        },
+        {
+            id: 4,
+            name: "Sukhad Pachan Granules – Ayurvedic Digestive",
+            price: 319,
+            oldPrice: 399,
+            discount: "-20%",
+            img: "https://refineveda.com/cdn/shop/files/SukhadPachan_copy_-Photoroom.jpg?v=1761901080&width=720",
+            hoverImg: "https://refineveda.com/cdn/shop/files/1_3d3851b1-3a5f-4753-95c7-92e24162309f.png?v=1762517645&width=720"
         }
     ];
 

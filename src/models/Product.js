@@ -20,7 +20,7 @@ const ProductSchema = new mongoose.Schema(
         size: String,
         price: Number,     
         oldPrice: Number,   
-        stock: Number,
+        // stock
         image: {
           url: String,
           public_id: String,

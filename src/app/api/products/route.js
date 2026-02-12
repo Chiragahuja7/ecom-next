@@ -12,13 +12,11 @@ export async function POST(req) {
 
     if (body.price !== undefined) body.price = Number(body.price);
     if (body.oldPrice !== undefined) body.oldPrice = Number(body.oldPrice);
-    if (body.stock !== undefined) body.stock = Number(body.stock);
       if (Array.isArray(body.sizes)) {
         body.sizes = body.sizes.map((sz) => ({
           size: sz.size,
           price: sz.price !== undefined && sz.price !== null ? Number(sz.price) : undefined,
           oldPrice: sz.oldPrice !== undefined && sz.oldPrice !== null ? Number(sz.oldPrice) : undefined,
-          stock: sz.stock !== undefined && sz.stock !== null ? Number(sz.stock) : undefined,
           image: sz.image || null,
         }));
       }
@@ -57,13 +55,11 @@ export async function PUT(req) {
     let product;
     if (update.price !== undefined) update.price = Number(update.price);
     if (update.oldPrice !== undefined) update.oldPrice = Number(update.oldPrice);
-    if (update.stock !== undefined) update.stock = Number(update.stock);
     if (Array.isArray(update.sizes)) {
       update.sizes = update.sizes.map((sz) => ({
         size: sz.size,
         price: sz.price !== undefined && sz.price !== null ? Number(sz.price) : undefined,
         oldPrice: sz.oldPrice !== undefined && sz.oldPrice !== null ? Number(sz.oldPrice) : undefined,
-        stock: sz.stock !== undefined && sz.stock !== null ? Number(sz.stock) : undefined,
         image: sz.image || null,
       }));
     }

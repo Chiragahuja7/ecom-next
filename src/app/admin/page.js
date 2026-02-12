@@ -12,7 +12,6 @@ export default function Admin() {
       oldPrice:"",
       images: [],
       category: "",
-      stock: "",
       sizes: [],
     });
     const [editingId, setEditingId] = useState(null);
@@ -77,7 +76,7 @@ export default function Admin() {
     }
 
     function addSize() {
-      setForm((s) => ({ ...s, sizes: [...(s.sizes || []), { size: "", price: "", oldPrice: "", stock: "", image: null }] }));
+      setForm((s) => ({ ...s, sizes: [...(s.sizes || []), { size: "", price: "", oldPrice: "", image: null }] }));
     }
 
     function removeSize(index) {
@@ -86,9 +85,10 @@ export default function Admin() {
 
     function handleSizeChange(index, e) {
       const { name, value } = e.target;
+      const val = typeof value === "string" ? value.trim() : value;
       setForm((s) => {
         const sizes = Array.isArray(s.sizes) ? [...s.sizes] : [];
-        sizes[index] = { ...(sizes[index] || {}), [name]: value };
+        sizes[index] = { ...(sizes[index] || {}), [name]: val };
         return { ...s, sizes };
       });
     }
@@ -102,13 +102,12 @@ export default function Admin() {
                 price: form.price === "" ? undefined : parseFloat(form.price),
                 oldPrice: form.oldPrice === "" ? undefined : parseFloat(form.oldPrice),
                 images: Array.isArray(form.images) ? form.images : [],
-                stock: form.stock === "" ? undefined : parseInt(form.stock) || 0,
                 sizes: Array.isArray(form.sizes)
                   ? form.sizes.map((sz) => ({
                       size: sz.size,
                       price: sz.price === "" ? undefined : Number(sz.price),
                       oldPrice: sz.oldPrice === "" ? undefined : Number(sz.oldPrice),
-                      stock: sz.stock === "" ? undefined : Number(sz.stock),
+                      // stock removed
                       image: sz.image || null,
                     }))
                   : [],
@@ -133,7 +132,7 @@ export default function Admin() {
               return;
             }
 
-            setForm({ name: "", slug: "", description: "", price: "", oldPrice: "", images: [], category: "", stock: "", sizes: [] });
+            setForm({ name: "", slug: "", description: "", price: "", oldPrice: "", images: [], category: "", sizes: [] });
             setEditingId(null);
             fetchProducts();
           } catch (err) {
@@ -159,13 +158,11 @@ export default function Admin() {
         oldPrice: p.oldPrice ?? "",
         images: imgs,
         category: p.category || "",
-        stock: p.stock ?? "",
         sizes: Array.isArray(p.sizes)
           ? p.sizes.map((sz) => ({
               size: sz.size || "",
               price: sz.price ?? "",
               oldPrice: sz.oldPrice ?? "",
-              stock: sz.stock ?? "",
               image: sz.image ? (typeof sz.image === "string" ? { url: sz.image } : sz.image) : null,
             }))
           : [],
@@ -257,19 +254,7 @@ export default function Admin() {
           />
         </div>
 
-        <div>
-          <label className="font-medium">
-            Stock
-          </label>
-          <input
-            name="stock"
-            type="number"
-            value={form.stock}
-            onChange={handleChange}
-            className="w-full border rounded-lg px-3 py-2 mt-1"
-            required
-          />
-        </div>
+        
 
         <div>
           <label className="font-medium">
@@ -312,7 +297,7 @@ export default function Admin() {
                 <input name="size" value={sz.size} onChange={(e) => handleSizeChange(idx, e)} placeholder="Size (e.g. 500ml)" className="border rounded px-2 py-1" />
                 <input name="price" value={sz.price} onChange={(e) => handleSizeChange(idx, e)} type="number" step="0.01" placeholder="Price" className="border rounded px-2 py-1" />
                 <input name="oldPrice" value={sz.oldPrice} onChange={(e) => handleSizeChange(idx, e)} type="number" step="0.01" placeholder="Old Price" className="border rounded px-2 py-1" />
-                <input name="stock" value={sz.stock} onChange={(e) => handleSizeChange(idx, e)} type="number" placeholder="Stock" className="border rounded px-2 py-1 w-20" />
+                {/* stock removed */}
                 <input type="file" onChange={(e) => handleSizeFile(idx, e)} className="border rounded px-2 py-1" />
                 {sz.image && sz.image.url && (
                   <img src={sz.image.url} alt="size" className="w-16 h-16 object-cover rounded" />
@@ -361,7 +346,6 @@ export default function Admin() {
                   oldPrice: "",
                   images: [],
                   category: "",
-                  stock: "",
                   sizes: [],
                 });
               }}
@@ -389,7 +373,6 @@ export default function Admin() {
               <th className="p-3 border">Slug</th>
               <th className="p-3 border">Price</th>
               <th className="p-3 border">Old Price</th>
-              <th className="p-3 border">Stock</th>
               <th className="p-3 border">Category</th>
               <th className="p-3 border">Actions</th>
             </tr>
@@ -409,7 +392,6 @@ export default function Admin() {
                 <td className="p-3 border">
                   ₹ {p.oldPrice}
                 </td>
-                <td className="p-3 border">{p.stock}</td>
                 <td className="p-3 border">
                   {p.category}
                 </td>
