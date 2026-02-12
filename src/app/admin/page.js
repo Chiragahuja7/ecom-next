@@ -13,6 +13,7 @@ export default function Admin() {
       images: [],
       category: "",
       stock: "",
+      sizes: [],
     });
     const [editingId, setEditingId] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -47,21 +48,71 @@ export default function Admin() {
       setLoading(false);
     }
 
+    async function handleSizeFile(index, e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      setLoading(true);
+      try {
+        const fd = new FormData();
+        fd.append("files", file);
+        const res = await fetch("/api/upload", { method: "POST", body: fd });
+        const data = await res.json();
+        const upload = data?.uploads?.[0];
+        if (upload) {
+          setForm((s) => {
+            const sizes = Array.isArray(s.sizes) ? [...s.sizes] : [];
+            sizes[index] = { ...(sizes[index] || {}), image: upload };
+            return { ...s, sizes };
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     function removeImage(index) {
       setForm((s) => ({ ...s, images: (s.images || []).filter((_, i) => i !== index) }));
+    }
+
+    function addSize() {
+      setForm((s) => ({ ...s, sizes: [...(s.sizes || []), { size: "", price: "", oldPrice: "", stock: "", image: null }] }));
+    }
+
+    function removeSize(index) {
+      setForm((s) => ({ ...s, sizes: (s.sizes || []).filter((_, i) => i !== index) }));
+    }
+
+    function handleSizeChange(index, e) {
+      const { name, value } = e.target;
+      setForm((s) => {
+        const sizes = Array.isArray(s.sizes) ? [...s.sizes] : [];
+        sizes[index] = { ...(sizes[index] || {}), [name]: value };
+        return { ...s, sizes };
+      });
     }
 
     async function handleSubmit(e) {
         e.preventDefault();
           setLoading(true);
-          try {
-            const payload = {
-              ...form,
-              price: form.price === "" ? undefined : parseFloat(form.price),
-              oldPrice: form.oldPrice === "" ? undefined : parseFloat(form.oldPrice),
-              images: Array.isArray(form.images) ? form.images : [],
-              stock: form.stock === "" ? undefined : parseInt(form.stock) || 0,
-            };
+            try {
+              const payload = {
+                ...form,
+                price: form.price === "" ? undefined : parseFloat(form.price),
+                oldPrice: form.oldPrice === "" ? undefined : parseFloat(form.oldPrice),
+                images: Array.isArray(form.images) ? form.images : [],
+                stock: form.stock === "" ? undefined : parseInt(form.stock) || 0,
+                sizes: Array.isArray(form.sizes)
+                  ? form.sizes.map((sz) => ({
+                      size: sz.size,
+                      price: sz.price === "" ? undefined : Number(sz.price),
+                      oldPrice: sz.oldPrice === "" ? undefined : Number(sz.oldPrice),
+                      stock: sz.stock === "" ? undefined : Number(sz.stock),
+                      image: sz.image || null,
+                    }))
+                  : [],
+              };
 
             const method = editingId ? "PUT" : "POST";
             const body = editingId ? JSON.stringify({ id: editingId, ...payload }) : JSON.stringify(payload);
@@ -82,7 +133,7 @@ export default function Admin() {
               return;
             }
 
-            setForm({ name: "", slug: "", description: "", price: "", oldPrice: "", images: [], category: "", stock: "" });
+            setForm({ name: "", slug: "", description: "", price: "", oldPrice: "", images: [], category: "", stock: "", sizes: [] });
             setEditingId(null);
             fetchProducts();
           } catch (err) {
@@ -91,24 +142,6 @@ export default function Admin() {
           } finally {
             setLoading(false);
           }
-
-        if (editingId) {
-            await fetch("/api/products", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: editingId, ...payload }),
-            });
-        } else {
-            await fetch("/api/products", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
-        }
-
-        setForm({ name: "", slug: "", description: "", price: "", oldPrice: "", images: [], category: "", stock: "" });
-        setEditingId(null);
-        fetchProducts();
     }
 
     async function handleEdit(p) {
@@ -127,6 +160,15 @@ export default function Admin() {
         images: imgs,
         category: p.category || "",
         stock: p.stock ?? "",
+        sizes: Array.isArray(p.sizes)
+          ? p.sizes.map((sz) => ({
+              size: sz.size || "",
+              price: sz.price ?? "",
+              oldPrice: sz.oldPrice ?? "",
+              stock: sz.stock ?? "",
+              image: sz.image ? (typeof sz.image === "string" ? { url: sz.image } : sz.image) : null,
+            }))
+          : [],
       });
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -196,6 +238,7 @@ export default function Admin() {
             value={form.price}
             onChange={handleChange}
             className="w-full border rounded-lg px-3 py-2 mt-1"
+            required
           />
         </div>
 
@@ -210,6 +253,7 @@ export default function Admin() {
             value={form.oldPrice}
             onChange={handleChange}
             className="w-full border rounded-lg px-3 py-2 mt-1"
+            required
           />
         </div>
 
@@ -223,6 +267,7 @@ export default function Admin() {
             value={form.stock}
             onChange={handleChange}
             className="w-full border rounded-lg px-3 py-2 mt-1"
+            required
           />
         </div>
 
@@ -235,6 +280,7 @@ export default function Admin() {
             value={form.category}
             onChange={handleChange}
             className="w-full border rounded-lg px-3 py-2 mt-1"
+            required
           />
         </div>
 
@@ -245,6 +291,7 @@ export default function Admin() {
             multiple
             onChange={handleFiles}
             className="w-full border rounded-lg px-3 py-2 mt-1"
+            required
           />
 
           <div className="flex gap-3 flex-wrap mt-3">
@@ -254,6 +301,28 @@ export default function Admin() {
                 <button type="button" onClick={() => removeImage(idx)} className="absolute right-0 top-0 bg-white rounded-full px-2">✕</button>
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="font-medium">Sizes</label>
+          <div className="space-y-3 mt-2">
+            {(form.sizes || []).map((sz, idx) => (
+              <div key={idx} className="flex gap-2 items-center">
+                <input name="size" value={sz.size} onChange={(e) => handleSizeChange(idx, e)} placeholder="Size (e.g. 500ml)" className="border rounded px-2 py-1" />
+                <input name="price" value={sz.price} onChange={(e) => handleSizeChange(idx, e)} type="number" step="0.01" placeholder="Price" className="border rounded px-2 py-1" />
+                <input name="oldPrice" value={sz.oldPrice} onChange={(e) => handleSizeChange(idx, e)} type="number" step="0.01" placeholder="Old Price" className="border rounded px-2 py-1" />
+                <input name="stock" value={sz.stock} onChange={(e) => handleSizeChange(idx, e)} type="number" placeholder="Stock" className="border rounded px-2 py-1 w-20" />
+                <input type="file" onChange={(e) => handleSizeFile(idx, e)} className="border rounded px-2 py-1" />
+                {sz.image && sz.image.url && (
+                  <img src={sz.image.url} alt="size" className="w-16 h-16 object-cover rounded" />
+                )}
+                <button type="button" onClick={() => removeSize(idx)} className="bg-red-500 text-white px-2 py-1 rounded">Remove</button>
+              </div>
+            ))}
+            <div>
+              <button type="button" onClick={addSize} className="bg-gray-200 px-3 py-1 rounded">Add Size</button>
+            </div>
           </div>
         </div>
 
@@ -293,6 +362,7 @@ export default function Admin() {
                   images: [],
                   category: "",
                   stock: "",
+                  sizes: [],
                 });
               }}
               className="border px-6 py-2 rounded-lg hover:bg-gray-200 transition"
