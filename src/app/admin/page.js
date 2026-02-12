@@ -8,8 +8,8 @@ export default function Admin() {
       name: "",
       slug: "",
       description: "",
-      price: "",
-      oldPrice:"",
+      // price: "",
+      // oldPrice:"",
       images: [],
       category: "",
       sizes: [],
@@ -99,15 +99,14 @@ export default function Admin() {
             try {
               const payload = {
                 ...form,
-                price: form.price === "" ? undefined : parseFloat(form.price),
-                oldPrice: form.oldPrice === "" ? undefined : parseFloat(form.oldPrice),
+                // price: form.price === "" ? undefined : parseFloat(form.price),
+                // oldPrice: form.oldPrice === "" ? undefined : parseFloat(form.oldPrice),
                 images: Array.isArray(form.images) ? form.images : [],
                 sizes: Array.isArray(form.sizes)
                   ? form.sizes.map((sz) => ({
                       size: sz.size,
                       price: sz.price === "" ? undefined : Number(sz.price),
                       oldPrice: sz.oldPrice === "" ? undefined : Number(sz.oldPrice),
-                      // stock removed
                       image: sz.image || null,
                     }))
                   : [],
@@ -132,7 +131,7 @@ export default function Admin() {
               return;
             }
 
-            setForm({ name: "", slug: "", description: "", price: "", oldPrice: "", images: [], category: "", sizes: [] });
+            setForm({ name: "", slug: "", description: "" , images: [], category: "", sizes: [] });
             setEditingId(null);
             fetchProducts();
           } catch (err) {
@@ -154,8 +153,8 @@ export default function Admin() {
         name: p.name || "",
         slug: p.slug || "",
         description: p.description || "",
-        price: p.price ?? "",
-        oldPrice: p.oldPrice ?? "",
+        // price: p.price ?? "",
+        // oldPrice: p.oldPrice ?? "",
         images: imgs,
         category: p.category || "",
         sizes: Array.isArray(p.sizes)
@@ -224,7 +223,7 @@ export default function Admin() {
           />
         </div>
 
-        <div>
+        {/* <div>
           <label className="font-medium">
             Price
           </label>
@@ -252,7 +251,7 @@ export default function Admin() {
             className="w-full border rounded-lg px-3 py-2 mt-1"
             required
           />
-        </div>
+        </div> */}
 
         
 
@@ -294,10 +293,9 @@ export default function Admin() {
           <div className="space-y-3 mt-2">
             {(form.sizes || []).map((sz, idx) => (
               <div key={idx} className="flex gap-2 items-center">
-                <input name="size" value={sz.size} onChange={(e) => handleSizeChange(idx, e)} placeholder="Size (e.g. 500ml)" className="border rounded px-2 py-1" />
+                <input name="size" value={sz.size} onChange={(e) => handleSizeChange(idx, e)} placeholder="Size " className="border rounded px-2 py-1" />
                 <input name="price" value={sz.price} onChange={(e) => handleSizeChange(idx, e)} type="number" step="0.01" placeholder="Price" className="border rounded px-2 py-1" />
                 <input name="oldPrice" value={sz.oldPrice} onChange={(e) => handleSizeChange(idx, e)} type="number" step="0.01" placeholder="Old Price" className="border rounded px-2 py-1" />
-                {/* stock removed */}
                 <input type="file" onChange={(e) => handleSizeFile(idx, e)} className="border rounded px-2 py-1" />
                 {sz.image && sz.image.url && (
                   <img src={sz.image.url} alt="size" className="w-16 h-16 object-cover rounded" />
@@ -342,8 +340,8 @@ export default function Admin() {
                   name: "",
                   slug: "",
                   description: "",
-                  price: "",
-                  oldPrice: "",
+                  // price: "",
+                  // oldPrice: "",
                   images: [],
                   category: "",
                   sizes: [],
@@ -371,8 +369,8 @@ export default function Admin() {
             <tr>
               <th className="p-3 border">Name</th>
               <th className="p-3 border">Slug</th>
-              <th className="p-3 border">Price</th>
-              <th className="p-3 border">Old Price</th>
+              {/* <th className="p-3 border">Price</th>
+              <th className="p-3 border">Old Price</th> */}
               <th className="p-3 border">Category</th>
               <th className="p-3 border">Actions</th>
             </tr>
@@ -386,12 +384,12 @@ export default function Admin() {
               >
                 <td className="p-3 border">{p.name}</td>
                 <td className="p-3 border">{p.slug}</td>
-                <td className="p-3 border">
+                {/* <td className="p-3 border">
                   ₹ {p.price}
                 </td>
                 <td className="p-3 border">
                   ₹ {p.oldPrice}
-                </td>
+                </td> */}
                 <td className="p-3 border">
                   {p.category}
                 </td>

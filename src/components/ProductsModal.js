@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
@@ -9,13 +9,42 @@ import "swiper/css";
 import "swiper/css/pagination";
 
 export default function ProductModal({ product, onClose }) {
-  const [variant, setVariant] = useState("500ml");
+  const [variant, setVariant] = useState("");
   const [qty, setQty] = useState(1);
 
-  const isArrayImages = Array.isArray(product.images);
-  const gallery = isArrayImages
-    ? (product.images || []).map((it) => (typeof it === "string" ? it : it.url || it.secure_url))
-    : (product.images && product.images[variant]) || [];
+  // Set default variant when product prop changes
+  useEffect(() => {
+    if (!product) return;
+    if (Array.isArray(product.sizes) && product.sizes.length > 0) {
+      setVariant((v) => v || product.sizes[0].size);
+    }
+  }, [product]);
+
+  // Helper: get URL string from image item
+  function imgUrl(item) {
+    if (!item) return null;
+    if (typeof item === "string") return item;
+    return item.url || item.secure_url || null;
+  }
+
+  // Determine the currently selected size object (if sizes exist)
+  const isSizeBased = Array.isArray(product?.sizes) && product.sizes.length > 0;
+  const selectedSize = isSizeBased ? product.sizes.find((s) => s.size === variant) || product.sizes[0] : null;
+
+  // Build a gallery: prefer size-specific images first, then global images
+  const globalImages = Array.isArray(product?.images)
+    ? (product.images || []).map(imgUrl).filter(Boolean)
+    : [];
+
+  let sizeImages = [];
+  // support legacy shape where product.images could be an object keyed by variant
+  if (product && !Array.isArray(product.images) && product.images && product.images[variant]) {
+    sizeImages = (product.images[variant] || []).map(imgUrl).filter(Boolean);
+  } else if (selectedSize && selectedSize.image && imgUrl(selectedSize.image)) {
+    sizeImages = [imgUrl(selectedSize.image)];
+  }
+
+  const gallery = [...sizeImages, ...globalImages];
 
   function increaseQty() {
     setQty((prev) => prev + 1);
@@ -48,30 +77,31 @@ export default function ProductModal({ product, onClose }) {
         </div>
 
         <div className="mt-4 md:mt-0 md:pl-6">
-          <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm">
-            {product.discount}
-          </span>
-          <h2 className="text-xl md:text-2xl font-bold mt-2 text-black">
-            {product.name}
-          </h2>
+          {product?.discount && (
+            <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm">{product.discount}</span>
+          )}
+
+          <h2 className="text-xl md:text-2xl font-bold mt-2 text-black">{product.name}</h2>
+
           <div className="mt-2">
             <span className="text-green-700 text-xl font-bold">
-              Rs. {product.price}.00
+              Rs. {selectedSize?.price ?? product?.price}.00
             </span>
-            <span className="line-through text-gray-400 ml-2">
-              Rs. {product.oldPrice}.00
-            </span>
+            {(selectedSize?.oldPrice ?? product?.oldPrice) != null && (
+              <span className="line-through text-gray-400 ml-2">Rs. {selectedSize?.oldPrice ?? product?.oldPrice}.00</span>
+            )}
           </div>
-          <p className="text-gray-500 mt-2">
-            Weight: <b>{variant}</b>
-          </p>
 
-          {!isArrayImages && (
+          <p className="text-gray-500 mt-2">Weight: <b>{selectedSize?.size ?? variant}</b></p>
+
+          {isSizeBased && (
             <div className="flex gap-2 mt-3">
-              {Object.keys(product.images).map((v) => (
-                <button key={v} onClick={() => setVariant(v)}
-                  className={`border px-3 py-2 rounded-lg text-sm text-black ${variant === v? "bg-black text-white": ""}`}>
-                  {v}
+              {product.sizes.map((s) => (
+                <button
+                  key={s.size}
+                  onClick={() => setVariant(s.size)}
+                  className={`border px-3 py-2 rounded-lg text-sm text-black ${variant === s.size ? "bg-black text-white" : ""}`}>
+                  {s.size}
                 </button>
               ))}
             </div>
