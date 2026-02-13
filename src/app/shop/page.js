@@ -59,8 +59,8 @@ export default function Shop(){
                 </Link>
                 <h3 className="text-black font-semibold mt-3 text-center">{item.name}</h3>
                 <div className="text-center mt-1">
-                    <span className="text-green-700 font-bold">Rs. {item.price}.00</span>
-                    <span className="text-gray-400 line-through ms-2"> Rs. {item.oldPrice}.00</span>
+                    <span className="text-green-700 font-bold">Rs.{item.sizes?.[0]?.price}.00</span>
+                    <span className="text-gray-400 line-through ms-2"> Rs.{item.sizes?.[0]?.oldPrice}.00</span>
                 </div>
 
                 <button className="mt-4 border text-[#0f5b3f] font-bold hover:text-white border-gray-300 w-full py-2 rounded-full hover:bg-[#0f5b3f] transition" onClick={() => setSelectedProduct(item)}>

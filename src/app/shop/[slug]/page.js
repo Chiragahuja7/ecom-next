@@ -6,6 +6,8 @@ import {products} from "@/data/products"
 import Link from "next/link";
 import Image from "next/image";
 import ProductModal from "@/src/components/ProductsModal";
+import { useCart } from "@/src/Context/CartContext";
+import CartModal from "@/src/components/CartModal";
 
 export default function Page() {
   const {slug} = useParams();
@@ -16,6 +18,8 @@ export default function Page() {
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [displayImage, setDisplayImage] = useState(null);
+  const { addToCart, cartItems } = useCart();
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
   if (!slug) return;
@@ -155,7 +159,11 @@ export default function Page() {
               <button onClick={increaseQty} className="px-2">+</button>
             </div>
 
-            <button className="bg-gray-800 text-white w-full sm:w-auto md:px-44 px-5 py-3 rounded-full">Add to Cart</button>
+            <button className="bg-gray-800 text-white w-full sm:w-auto md:px-44 px-5 py-3 rounded-full" onClick={() => {
+              addToCart(product, selectedSize, quantity);
+              setIsCartOpen(true);
+            }}
+            >Add to Cart</button>
           </div>
           <button className="bg-green-900 mt-2 text-white w-full px-10 py-4 rounded-full">Buy It Now</button>
 
@@ -166,7 +174,6 @@ export default function Page() {
             </svg>
             <p>Estimate delivery times: <strong className="font-bold">3-5 days</strong> all across India</p>
             </div>
-            {/* <hr className="font-extralight"></hr> */}
             <div className="flex gap-2 ms-3 mt-5 font-extralight border-b border-gray-300 pb-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 20 20" fill="none">
             <path d="M3.32408 12.2187L2.05742 10.952C1.54076 10.4353 1.54076 9.5853 2.05742 9.06863L3.32408 7.80195C3.54075 7.58528 3.71575 7.16028 3.71575 6.86028V5.06859C3.71575 4.33526 4.31575 3.73528 5.04909 3.73528H6.84075C7.14075 3.73528 7.56575 3.5603 7.78242 3.34364L9.04908 2.07695C9.56574 1.56029 10.4158 1.56029 10.9324 2.07695L12.1991 3.34364C12.4158 3.5603 12.8407 3.73528 13.1407 3.73528H14.9324C15.6658 3.73528 16.2657 4.33526 16.2657 5.06859V6.86028C16.2657 7.16028 16.4407 7.58528 16.6574 7.80195L17.9241 9.06863C18.4408 9.5853 18.4408 10.4353 17.9241 10.952L16.6574 12.2187C16.4407 12.4353 16.2657 12.8603 16.2657 13.1603V14.9519C16.2657 15.6852 15.6658 16.2853 14.9324 16.2853H13.1407C12.8407 16.2853 12.4158 16.4603 12.1991 16.677L10.9324 17.9437C10.4158 18.4603 9.56574 18.4603 9.04908 17.9437L7.78242 16.677C7.56575 16.4603 7.14075 16.2853 6.84075 16.2853H5.04909C4.31575 16.2853 3.71575 15.6852 3.71575 14.9519V13.1603C3.71575 12.852 3.54075 12.427 3.32408 12.2187Z" stroke="#111111" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
@@ -421,7 +428,9 @@ export default function Page() {
         />
       )}
     </div>
-
+    {isCartOpen && (
+      <CartModal cartItems={cartItems} onClose={() => setIsCartOpen(false)} />
+    )}
   </div>
   );
 }
