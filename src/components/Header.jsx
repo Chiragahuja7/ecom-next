@@ -9,8 +9,8 @@ export default function Header(){
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { addToCart, cartItems } = useCart();
     return(
-        <header className="bg-[#0f5b3f] p-5">
-            <div className="flex justify-between mt-1 ms-5 mb-4">
+        <header className="bg-[#0f5b3f] p-4">
+            <div className="flex justify-between ms-5 mb-4">
                 <div className="md:hidden">
                 <i className="fa-solid fa-bars text-2xl"></i>
                 </div>
@@ -19,9 +19,10 @@ export default function Header(){
                     <i className="mt-3 ms-2 fa-solid fa-magnifying-glass text-stone-600"></i>
                     <input className="w-full text-black outline-none" placeholder="I am looking for...." />
                 </div>
-                <button onClick={() => setIsCartOpen(true)} className="hidden md:flex items-center gap-2 text-white">
+                <button onClick={() => setIsCartOpen(true)} className="flex items-center gap-2 text-white">
                     <i className="fa-solid fa-cart-shopping"></i>
                     Cart
+                    <p>{cartItems.length}</p>
                 </button>
             </div>
             <nav className="hidden md:flex border-t border-white/20">

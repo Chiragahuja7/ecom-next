@@ -18,8 +18,11 @@ export default function Page() {
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [displayImage, setDisplayImage] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const { addToCart, cartItems } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
+  
 
   useEffect(() => {
   if (!slug) return;
@@ -61,14 +64,14 @@ export default function Page() {
   if (sizeImages.length > 0) gallery.push(sizeImages[0]);
   if (commonImage) gallery.push(commonImage, commonImage);
   gallery.push(...remainingGlobals);
+  const uniqueGallery = Array.from(new Set(gallery.filter(Boolean)));
 
-  useEffect(() => {
-    if (gallery.length > 0) {
-      setDisplayImage(gallery[0]);
-    } else if (product?.images?.[0]) {
-      setDisplayImage(imgUrl(product.images[0]));
-    }
-  }, [selectedSize, product]);
+ useEffect(() => {
+  if (uniqueGallery.length > 0) {
+    setCurrentIndex(0);
+    setDisplayImage(uniqueGallery[0]);
+  }
+}, [selectedSize, product]);
 
   if (loading) return <div className="p-9 m-9">Loading...</div>;
   if (error) return <div className="p-9 m-9 text-red-600">Error: {error}</div>;
@@ -82,38 +85,81 @@ export default function Page() {
     setQuantity(prev => Math.max(1, prev - 1));
   }
 
+  function prevImage() {
+    if (uniqueGallery.length === 0) return;
+    const next = (currentIndex - 1 + uniqueGallery.length) % uniqueGallery.length;
+    setCurrentIndex(next);
+    setDisplayImage(uniqueGallery[next]);
+  }
+
+  function nextImage() {
+    if (uniqueGallery.length === 0) return;
+    const next = (currentIndex + 1) % uniqueGallery.length;
+    setCurrentIndex(next);
+    setDisplayImage(uniqueGallery[next]);
+  }
+
+  function closeLightbox() {
+    setIsLightboxOpen(false);
+    document.body.style.overflow = '';
+  }
+
   return (
   <div>
     <div>
       <div className="grid lg:grid-cols-2 grid-cols-1 gap-10 max-w-7xl mx-auto px-4 py-10">
         <div className="flex justify-center mt-6">
-          <div className="mt-3 flex flex-col gap-3">
-              {gallery.slice(0,2).map((img, idx) => (
+          <div className="me-2 mt-1 flex-col gap-3 hidden md:flex">
+              {uniqueGallery.map((img, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setDisplayImage(img)}
+                  onClick={() => { setCurrentIndex(idx); setDisplayImage(img); }}
                   className={`w-15 h-15 rounded border ${displayImage === img ? 'border-black' : 'border-gray-200'}`}>
                   <img src={img} alt={`thumb-${idx}`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
-           <div className="w-full max-w-md lg:max-w-lg h-120 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center flex-col">
+           <div className="w-full max-w-md lg:max-w-lg aspect-square bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative">
             {displayImage ? (
-              <img
-                src={displayImage}
-                alt={product.name}
-                className="w-full max-w-md lg:max-w-lg rounded-lg object-cover"
-              />
+              <>
+                <img
+                  src={displayImage}
+                  alt={product.name}
+                  className="w-full max-w-md lg:max-w-lg rounded-lg object-cover cursor-zoom-in"
+                  onClick={() => { setIsLightboxOpen(true); document.body.style.overflow = 'hidden'; }}
+                />
+                <button
+                  aria-label="previous image"
+                  onClick={() => {
+                    if (uniqueGallery.length === 0) return;
+                    const next = (currentIndex - 1 + uniqueGallery.length) % uniqueGallery.length;
+                    setCurrentIndex(next);
+                    setDisplayImage(uniqueGallery[next]);
+                  }}
+                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-black rounded-full p-4 shadow-md"
+                >
+                  ‹
+                </button>
+                <button
+                  aria-label="next image"
+                  onClick={() => {
+                    if (uniqueGallery.length === 0) return;
+                    const next = (currentIndex + 1) % uniqueGallery.length;
+                    setCurrentIndex(next);
+                    setDisplayImage(uniqueGallery[next]);
+                  }}
+                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-black rounded-full p-4 shadow-md">
+                  ›
+                </button>
+              </>
             ) : (
               <div className="w-full h-full flex items-center justify-center">No image</div>
             )}
-
-            
           </div>
           
         
       </div>
-        <div className="text-black font-bold overflow-scroll h-120 no-scrollbar">
+        <div className="text-black font-bold md:overflow-auto overflow-visible h-auto md:h-130 no-scrollbar">
           <span className="text-gray-700">Refineveda</span>
           <h1 className="text-3xl">{product.name}</h1>
           <div className="flex">
@@ -126,8 +172,8 @@ export default function Page() {
           </div>
 
           <div className="mt-4">
-            <span className="me-3">Size:</span>
-
+            <span className="block mb-2 font-medium">Size:</span>
+          <div className="flex flex-wrap gap-2">
             {product.sizes?.map((item, index) => (
               <label key={index} className="ms-2 cursor-pointer">
                 <input
@@ -138,18 +184,13 @@ export default function Page() {
                   onChange={() => setSelectedSize(item)}
                 />
 
-                <span
-                  className={`px-4 py-2 border rounded 
-                  ${
-                    selectedSize?.size === item.size
-                      ? "bg-black text-white"
-                      : "bg-white text-black"
-                  }`}
-                >
+                <span className={`block text-center min-w-12 px-4 py-2 border rounded-lg text-sm sm:text-base transition-colors duration-200
+                ${ selectedSize?.size === item.size ? "bg-black text-white border-black" : "bg-white text-black border-gray-300 hover:border-black"}`}>
                   {item.size}
                 </span>
               </label>
             ))}
+          </div>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-5">
@@ -167,7 +208,7 @@ export default function Page() {
           </div>
           <button className="bg-green-900 mt-2 text-white w-full px-10 py-4 rounded-full">Buy It Now</button>
 
-          <div className="border border-gray-300 h-48 mt-6 p-4 rounded-lg">
+          <div className="border border-gray-300 md:h-48 mt-6 p-4 rounded-lg">
             <div className="flex gap-2 ms-3 mt-3 font-extralight border-b border-gray-300 pb-3">
             <svg width="25" height="25" fill="none">
             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 14.501h1c1.1 0 2-.9 2-2v-10H6c-1.5 0-2.81.83-3.49 2.05"></path><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M2 17.501c0 1.66 1.34 3 3 3h1c0-1.1.9-2 2-2s2 .9 2 2h4c0-1.1.9-2 2-2s2 .9 2 2h1c1.66 0 3-1.34 3-3v-3h-3c-.55 0-1-.45-1-1v-3c0-.55.45-1 1-1h1.29l-1.71-2.99a2.016 2.016 0 0 0-1.74-1.01H15v7c0 1.1-.9 2-2 2h-1"></path><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 22.501a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM16 22.501a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM22 12.501v2h-3c-.55 0-1-.45-1-1v-3c0-.55.45-1 1-1h1.29l1.71 3ZM2 8.501h6M2 11.501h4M2 14.501h2"></path>
@@ -183,7 +224,7 @@ export default function Page() {
           </svg>
           <p>Use code "<strong className="font-bold">EXTRA10</strong>" to get extra 10% OFF on your order.</p>
             </div>
-            <div className="flex gap-2 ms-3 mt-5 font-extralight">
+            <div className="flex gap-2 ms-3 mt-5 font-extralight md:pb-0 pb-3">
             <svg viewBox="0 0 32 32" width="25" fill="none">
             <path d="M20.249 15.55v-4.575L8.386 4.125" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
             <path d="M2.962 8.3 14 14.687l10.962-6.35M14 26.013V14.675" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
@@ -193,7 +234,7 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="mt-4 flex cursor-pointer">
+          <div className="mt-4 ms-3 md:ms-0 flex cursor-pointer">
             <svg width="14" height="15" fill="none" className="mt-1 text-color hover-heading-color">
             <path fill="currentColor" d="M9.813 11.407a.835.835 0 0 0-.11.281 1.59 1.59 0 0 0-.031.313c0 .188.031.365.094.531.073.156.171.292.296.406.115.125.25.224.407.297a1.5 1.5 0 0 0 .531.094c.188 0 .36-.031.516-.094.166-.073.307-.171.421-.296.126-.115.22-.25.282-.407a1.31 1.31 0 0 0 0-1.047 1.075 1.075 0 0 0-.281-.421 1.074 1.074 0 0 0-.422-.282 1.31 1.31 0 0 0-1.047 0 1.098 1.098 0 0 0-.406.281l-.094.094a.418.418 0 0 0-.078.11c0 .01-.006.02-.016.03-.01.011-.016.022-.016.032l-.03.031a.12.12 0 0 1-.017.047Zm.062-8.031c.02.042.047.083.078.125a.544.544 0 0 0 .11.11c.114.124.25.223.406.296a1.5 1.5 0 0 0 .531.094c.188 0 .36-.031.516-.094.166-.073.307-.172.421-.297a1.25 1.25 0 0 0 .282-.422 1.274 1.274 0 0 0 0-1.03 1.216 1.216 0 0 0-.281-.438 1.359 1.359 0 0 0-.422-.282 1.31 1.31 0 0 0-1.047 0 1.414 1.414 0 0 0-.406.282c-.126.125-.224.27-.297.437a1.376 1.376 0 0 0-.094.516c0 .114.01.224.031.328.031.104.073.203.125.297v.031c.01 0 .016.005.016.016.01 0 .015.005.015.015l.016.016Zm-5.75 3.25a.82.82 0 0 0-.078-.125.544.544 0 0 0-.11-.11 1.074 1.074 0 0 0-.421-.28 1.31 1.31 0 0 0-1.047 0 1.098 1.098 0 0 0-.407.28c-.124.126-.223.271-.296.438a1.334 1.334 0 0 0-.094.5c0 .188.031.365.094.531.073.157.171.297.296.422a1.311 1.311 0 0 0 1.453.281c.167-.072.308-.166.423-.28l.109-.11a.612.612 0 0 0 .078-.14h.016c0-.011.005-.022.015-.032.01-.01.016-.02.016-.031a1.02 1.02 0 0 0 .11-.297c.03-.115.046-.23.046-.344 0-.114-.016-.224-.047-.328a1.02 1.02 0 0 0-.11-.297c0-.01-.004-.016-.015-.016v-.03h-.015c0-.011-.006-.022-.016-.032Zm4.313-3.234a4.078 4.078 0 0 1-.079-.344 2.68 2.68 0 0 1 .172-1.422c.146-.323.339-.604.578-.844.24-.24.521-.427.844-.562a2.584 2.584 0 0 1 2.078 0c.334.135.62.323.86.562.24.24.427.521.562.844.146.323.219.672.219 1.047 0 .364-.073.708-.219 1.031a2.603 2.603 0 0 1-.562.844 2.64 2.64 0 0 1-1.89.781c-.366 0-.715-.068-1.048-.203a2.825 2.825 0 0 1-.844-.578L5.563 6.61c.03.115.057.235.078.36a2.277 2.277 0 0 1 0 .734 3.64 3.64 0 0 1-.079.36l3.547 2.062v-.016c.24-.24.521-.427.844-.562a2.585 2.585 0 0 1 2.078 0c.334.135.62.323.86.562.24.24.427.526.562.86a2.584 2.584 0 0 1 0 2.078 2.604 2.604 0 0 1-.562.844c-.24.24-.526.427-.86.562a2.585 2.585 0 0 1-2.078 0 2.603 2.603 0 0 1-.844-.562c-.24-.24-.432-.521-.578-.844A2.756 2.756 0 0 1 8.328 12c0-.125.01-.245.031-.36.021-.124.047-.25.079-.374L4.89 9.204v.016A2.64 2.64 0 0 1 3 10c-.366 0-.715-.068-1.048-.203a2.825 2.825 0 0 1-.844-.578c-.24-.24-.432-.521-.578-.844a2.68 2.68 0 0 1-.203-1.047c0-.364.068-.708.203-1.031.146-.323.339-.604.578-.844.24-.24.521-.427.844-.562a2.584 2.584 0 0 1 2.078 0c.334.135.62.323.86.562l3.546-2.062Z"></path>
           </svg>
@@ -307,7 +348,7 @@ export default function Page() {
           <div
             key={item.id}
             className="bg-white rounded-2xl p-4 transition">
-            <Link href="" className="block relative overflow-hidden rounded-xl group">
+            <Link href="" className="block relative md:overflow-hidden rounded-xl group">
 
               <span className="absolute top-3 left-3 bg-red-500 text-white text-sm font-semibold px-3 py-1 rounded-full z-10">
                 {item.discount}
@@ -375,7 +416,7 @@ export default function Page() {
           <div
             key={item.id}
             className="bg-white rounded-2xl p-4 transition">
-            <Link href="" className="block relative overflow-hidden rounded-xl group">
+            <Link href="" className="block relative md:overflow-hidden rounded-xl group">
 
               <span className="absolute top-3 left-3 bg-red-500 text-white text-sm font-semibold px-3 py-1 rounded-full z-10">
                 {item.discount}
@@ -428,6 +469,17 @@ export default function Page() {
         />
       )}
     </div>
+    {isLightboxOpen && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={closeLightbox}>
+        <button onClick={closeLightbox} className="absolute top-4 right-4 text-white bg-black/40 rounded-full p-2">✕</button>
+        <button onClick={(e) => { e.stopPropagation(); prevImage(); }} className="absolute left-4 md:left-8 text-white bg-black/30 rounded-full p-3">‹</button>
+        <div className="max-w-[95%] max-h-[90%] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+          <img src={displayImage} alt="lightbox" className="max-w-full max-h-full object-contain" />
+        </div>
+        <button onClick={(e) => { e.stopPropagation(); nextImage(); }} className="absolute right-4 md:right-8 text-white bg-black/30 rounded-full p-3">›</button>
+      </div>
+    )}
+
     {isCartOpen && (
       <CartModal cartItems={cartItems} onClose={() => setIsCartOpen(false)} />
     )}
