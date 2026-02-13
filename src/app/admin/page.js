@@ -302,7 +302,7 @@ export default function Admin() {
             value={form.description}
             onChange={handleChange}
             rows={4}
-            className="w-full border rounded-lg px-3 py-2 mt-1"
+            className="w-full border rounded-lg px-3 py-2 mt-1 overflow-auto"
           />
         </div>
 

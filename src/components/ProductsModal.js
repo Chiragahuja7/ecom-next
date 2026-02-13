@@ -12,7 +12,6 @@ export default function ProductModal({ product, onClose }) {
   const [variant, setVariant] = useState("");
   const [qty, setQty] = useState(1);
 
-  // Set default variant when product prop changes
   useEffect(() => {
     if (!product) return;
     if (Array.isArray(product.sizes) && product.sizes.length > 0) {
@@ -20,31 +19,32 @@ export default function ProductModal({ product, onClose }) {
     }
   }, [product]);
 
-  // Helper: get URL string from image item
   function imgUrl(item) {
     if (!item) return null;
     if (typeof item === "string") return item;
     return item.url || item.secure_url || null;
   }
 
-  // Determine the currently selected size object (if sizes exist)
   const isSizeBased = Array.isArray(product?.sizes) && product.sizes.length > 0;
   const selectedSize = isSizeBased ? product.sizes.find((s) => s.size === variant) || product.sizes[0] : null;
 
-  // Build a gallery: prefer size-specific images first, then global images
   const globalImages = Array.isArray(product?.images)
     ? (product.images || []).map(imgUrl).filter(Boolean)
     : [];
 
   let sizeImages = [];
-  // support legacy shape where product.images could be an object keyed by variant
   if (product && !Array.isArray(product.images) && product.images && product.images[variant]) {
     sizeImages = (product.images[variant] || []).map(imgUrl).filter(Boolean);
   } else if (selectedSize && selectedSize.image && imgUrl(selectedSize.image)) {
     sizeImages = [imgUrl(selectedSize.image)];
   }
 
-  const gallery = [...sizeImages, ...globalImages];
+  const commonImage = (globalImages.length > 1 ? globalImages[1] : globalImages[0]) || null;
+  const remainingGlobals = globalImages.filter((img) => img && img !== commonImage);
+  const gallery = [];
+  if (sizeImages.length > 0) gallery.push(sizeImages[0]);
+  if (commonImage) gallery.push(commonImage, commonImage);
+  gallery.push(...remainingGlobals);
 
   function increaseQty() {
     setQty((prev) => prev + 1);

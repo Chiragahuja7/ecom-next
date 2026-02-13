@@ -3,9 +3,11 @@ import Link from "next/link";
 import { allproducts } from "@/data/products";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import ProductModal from "@/src/components/ProductsModal";
 
 export default function Shop(){
     const [products,setProducts] = useState([]);
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
     useEffect(()=>{
         const fetchProducts = async () => {
@@ -52,8 +54,8 @@ export default function Shop(){
                     {/* <span className="absolute top-3 left-3 bg-red-500 text-white text-sm px-3 py-1 rounded-full z-10">
                         {item.discount}
                     </span> */}
-                    <Image src={primaryImg} height={100} width={300} alt={item.name} className="rounded-xl transition-opacity duration-300 group-hover:opacity-0 ease-linear"/>
-                    <Image src={hoverImg} height={100} width={300} alt="Hover" className="rounded-xl absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-linear"/>
+                    <Image src={primaryImg} height={100} width={300} alt={item.name} className="rounded-xl transition-opacity duration-300 group-hover:opacity-0 ease-linear w-full h-65 md:h-90"/>
+                    <Image src={hoverImg} height={100} width={300} alt="Hover" className="rounded-xl absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-linear w-full h-65 md:h-90"/>
                 </Link>
                 <h3 className="text-black font-semibold mt-3 text-center">{item.name}</h3>
                 <div className="text-center mt-1">
@@ -61,12 +63,18 @@ export default function Shop(){
                     <span className="text-gray-400 line-through ms-2"> Rs. {item.oldPrice}.00</span>
                 </div>
 
-                <button className="mt-4 border text-[#0f5b3f] font-bold hover:text-white border-gray-300 w-full py-2 rounded-full hover:bg-[#0f5b3f] transition">
+                <button className="mt-4 border text-[#0f5b3f] font-bold hover:text-white border-gray-300 w-full py-2 rounded-full hover:bg-[#0f5b3f] transition" onClick={() => setSelectedProduct(item)}>
                     Add to Cart
                 </button>
                 </div>
             )})}
             </div>
+            {selectedProduct && (
+             <ProductModal
+                product={selectedProduct}
+                onClose={() => setSelectedProduct(null)}
+            />
+            )}
             </div>
         </div>  
         </>

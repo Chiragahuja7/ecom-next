@@ -15,6 +15,7 @@ export default function Page() {
   const [quantity , setQuantity]=useState(1);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [displayImage, setDisplayImage] = useState(null);
 
   useEffect(() => {
   if (!slug) return;
@@ -30,6 +31,9 @@ export default function Page() {
         setSelectedSize(data.product.sizes[0]);
       }
 
+      const firstImg = data.product?.images && data.product.images[0] ? data.product.images[0].url : null;
+      setDisplayImage(firstImg);
+
     } catch (err) {
       setError(err.message || 'Error fetching product');
     } finally {
@@ -38,6 +42,29 @@ export default function Page() {
   };
   fetchData();
 }, [slug]);
+
+  function imgUrl(item) {
+    if (!item) return null;
+    if (typeof item === 'string') return item;
+    return item.url || item.secure_url || null;
+  }
+
+  const globalImages = Array.isArray(product?.images) ? (product.images || []).map(imgUrl).filter(Boolean) : [];
+  const sizeImages = selectedSize && selectedSize.image && imgUrl(selectedSize.image) ? [imgUrl(selectedSize.image)] : [];
+  const commonImage = (globalImages.length > 1 ? globalImages[1] : globalImages[0]) || null;
+  const remainingGlobals = globalImages.filter((img) => img && img !== commonImage);
+  const gallery = [];
+  if (sizeImages.length > 0) gallery.push(sizeImages[0]);
+  if (commonImage) gallery.push(commonImage, commonImage);
+  gallery.push(...remainingGlobals);
+
+  useEffect(() => {
+    if (gallery.length > 0) {
+      setDisplayImage(gallery[0]);
+    } else if (product?.images?.[0]) {
+      setDisplayImage(imgUrl(product.images[0]));
+    }
+  }, [selectedSize, product]);
 
   if (loading) return <div className="p-9 m-9">Loading...</div>;
   if (error) return <div className="p-9 m-9 text-red-600">Error: {error}</div>;
@@ -56,23 +83,30 @@ export default function Page() {
     <div>
       <div className="grid lg:grid-cols-2 grid-cols-1 gap-10 max-w-7xl mx-auto px-4 py-10">
         <div className="flex justify-center mt-6">
-           <div className="w-full max-w-md lg:max-w-lg h-120 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
-          {selectedSize?.image?.url ? (
-          <img
-            src={selectedSize.image.url}
-            alt={product.name}
-            className="w-full max-w-md lg:max-w-lg rounded-lg object-cover"
-          />
-        ) : (
-          product.images?.length > 0 && (
-            <img
-              src={product.images[0].url}
-              alt={product.name}
-              className="w-full max-w-md lg:max-w-lg rounded-lg object-cover"
-            />
-          )
-        )}
-        </div>
+          <div className="mt-3 flex flex-col gap-3">
+              {gallery.slice(0,2).map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setDisplayImage(img)}
+                  className={`w-15 h-15 rounded border ${displayImage === img ? 'border-black' : 'border-gray-200'}`}>
+                  <img src={img} alt={`thumb-${idx}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+           <div className="w-full max-w-md lg:max-w-lg h-120 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center flex-col">
+            {displayImage ? (
+              <img
+                src={displayImage}
+                alt={product.name}
+                className="w-full max-w-md lg:max-w-lg rounded-lg object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">No image</div>
+            )}
+
+            
+          </div>
+          
         
       </div>
         <div className="text-black font-bold overflow-scroll h-120 no-scrollbar">
@@ -169,7 +203,7 @@ export default function Page() {
                 </summary>
                 
                 <div className="group-open:animate-fadeIn mt-3 text-gray-600">
-                  <p>{product.description}</p>
+                  <p className="whitespace-pre-line">{product.description}</p>
                 </div>
               </details>
               </div>
@@ -182,7 +216,7 @@ export default function Page() {
                 </summary>
                 
                 <div className="group-open:animate-fadeIn mt-3 text-gray-600">
-                  <p>{product.description}</p>
+                  <p className="whitespace-pre-line">{product.description}</p>
                 </div>
               </details>
               </div>
@@ -195,7 +229,7 @@ export default function Page() {
                 </summary>
                 
                 <div className="group-open:animate-fadeIn mt-3 text-gray-600">
-                  <p>{product.description}</p>
+                  <p className="whitespace-pre-line">{product.description}</p>
                 </div>
               </details>
               </div>
@@ -208,7 +242,7 @@ export default function Page() {
                 </summary>
                 
                 <div className="group-open:animate-fadeIn mt-3 text-gray-600">
-                  <p>{product.description}</p>
+                  <p className="whitespace-pre-line">{product.description}</p>
                 </div>
               </details>
               </div>
