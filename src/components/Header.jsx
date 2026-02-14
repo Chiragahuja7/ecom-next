@@ -22,7 +22,7 @@ export default function Header(){
                 <button onClick={() => setIsCartOpen(true)} className="flex items-center gap-2 text-white">
                     <i className="fa-solid fa-cart-shopping"></i>
                     Cart
-                    <p>{cartItems.length}</p>
+                    <p>({cartItems.length})</p>
                 </button>
             </div>
             <nav className="hidden md:flex border-t border-white/20">

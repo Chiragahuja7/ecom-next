@@ -1,9 +1,11 @@
 import { useState , useEffect} from "react";
 import { useCart } from "../Context/CartContext";
+import CheckoutModal from "./CheckoutModal";
 
 export default function CartModal({ cartItems, onClose }) {
   const { removeFromCart, increaseQty, decreaseQty } = useCart();
   const [show, setShow] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
 
 useEffect(() => {
   setTimeout(() => setShow(true), 10);
@@ -26,6 +28,7 @@ useEffect(() => {
   );
 
   return (
+    <>
     <div onClick={handleClose} className={"fixed inset-0 z-50 flex justify-end items-end md:items-center text-black bg-black/50"}>
       <div onClick={(e) => e.stopPropagation()}  className={`bg-white w-full flex flex-col md:w-120 h-full relative transform transition-transform duration-500 ease-in-out ${show ? "translate-x-0" : "translate-x-full"}`} >
         <button onClick={handleClose} className="absolute right-4 top-4 text-xl ease-out transition-all duration-700">✕</button>
@@ -90,12 +93,14 @@ useEffect(() => {
             </div>
             <div>
             <button className=" bg-white text-green-950 w-full px-10 py-3 rounded-full">View Cart</button>
-            <button className="bg-[#444444] mt-4 text-white w-full px-10 py-3 rounded-full">Checkout</button>
+            <button onClick={() => setShowCheckout(true)} className="bg-[#444444] mt-4 text-white w-full px-10 py-3 rounded-full">Checkout</button>
             </div>
             </div>
           </>
         )}
       </div>
     </div>
+    {showCheckout && <CheckoutModal onClose={() => setShowCheckout(false)} />}
+    </>
   );
 }
