@@ -130,9 +130,14 @@ export default function CheckoutModal({ onClose }) {
 
         <div className="mb-4">
           <p className="font-semibold">Items ({cartItems.length})</p>
-          <ul className="mt-2 max-h-40 overflow-auto">
+          <ul className="mt-2 max-h-25 overflow-auto">
             {cartItems.map((item, i) => (
-              <li key={i} className="flex justify-between py-2 border-b">
+              <li key={i} className="flex justify-between py-1 border-b-gray-200 border-b">
+                <img
+                  src={item.selectedSize?.image?.url || item.images?.[0]?.url}
+                  alt={item.name}
+                  className="w-15 h-12 object-cover rounded"
+                />
                 <div>
                   <p className="font-medium">{item.name}</p>
                   <p className="text-sm text-gray-500">Size: {item.selectedSize?.size} × {item.quantity}</p>

@@ -6,6 +6,7 @@ export default function CartModal({ cartItems, onClose }) {
   const { removeFromCart, increaseQty, decreaseQty } = useCart();
   const [show, setShow] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
+  
 
 useEffect(() => {
   setTimeout(() => setShow(true), 10);
@@ -58,7 +59,11 @@ useEffect(() => {
             <ul>
               {cartItems.map((item, index) => (
                 <li key={index} className="flex mb-4 p-4 border-b border-gray-200">
-                  <img src={item.images?.[0]?.url} alt={item.name} className="w-25 h-30 object-cover rounded mr-4"/>
+                    <img
+                      src={item.selectedSize?.image?.url || item.images?.[0]?.url}
+                      alt={item.name}
+                      className="w-25 h-30 object-cover rounded mr-4"
+                    />
                   <div className="flex flex-col">
                     <h3 className="font-semibold">{item.name}</h3>
                     <p className="text-sm text-gray-500">
@@ -79,7 +84,7 @@ useEffect(() => {
                     <button onClick={() => increaseQty(item._id, item.selectedSize?.size)} className="px-2">+</button>
                     </div>
                   </div>
-                  <button onClick={() => removeFromCart(item._id, item.selectedSize?.size)} className="absolute right-4 mt-9">
+                  <button onClick={() => removeFromCart(item._id, item.selectedSize?.size)} className="relative md:mt-14 md:ms-35 mt-18 ms-15">
                     <i className="fa-solid fa-trash"></i>
                   </button>
                 </li>
