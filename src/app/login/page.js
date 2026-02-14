@@ -26,7 +26,6 @@ export default function LoginPage(){
                 alert("Login Failed: " + data.message || "Invalid credentials");
             }
             else{
-                alert(data.message);
                 router.push("/admin");
             }
             }catch(error){
