@@ -1,6 +1,12 @@
 "use client";
 
+import { categories } from "@/data/products";
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+
+const Select = dynamic(() => import("react-select"), {
+  ssr: false,
+});
 
 export default function Admin() {
 
@@ -9,7 +15,7 @@ export default function Admin() {
     slug: "",
     description: "",
     images: [],
-    category: "",
+    category: [],
     sizes: [],
   };
 
@@ -173,7 +179,7 @@ export default function Admin() {
       slug: p.slug || "",
       description: p.description || "",
       images: p.images || [],
-      category: p.category || "",
+      category: p.category || [],
       sizes: p.sizes || [],
     });
 
@@ -235,13 +241,23 @@ export default function Admin() {
 
         <div>
           <label className="font-medium">Category</label>
-          <input
+          <Select
             name="category"
-            value={form.category}
-            onChange={handleChange}
-            className="w-full border rounded-lg px-3 py-2 mt-1"
-            required
-          />
+            value={categories
+              .filter((cat) => form.category.includes(cat))
+              .map((cat) => ({ value: cat, label: cat }))
+            }
+            onChange={(selected) =>
+              setForm({
+                ...form,
+                category: selected ? selected.map((s) => s.value) : [],
+              })
+            }
+            className="w-full border rounded-lg mt-1 p-0.5"
+            options={categories.map((cat) => ({ value: cat, label: cat }))}
+            isMulti
+          >
+          </Select>
         </div>
 
         <div>
@@ -271,7 +287,7 @@ export default function Admin() {
             {(form.sizes || []).map((sz, idx) => (
               <div key={idx} className="flex gap-2 items-center">
 
-                <input name="size" value={sz.size} onChange={(e) => handleSizeChange(idx, e)} placeholder="Size" className="border rounded px-2 py-1" />
+                <input name="size" value={sz.size} onChange={(e) => handleSizeChange(idx, e)} placeholder="Size" className="border rounded px-2 py-1" required />
 
                 <input name="price" value={sz.price} onChange={(e) => handleSizeChange(idx, e)} type="number" placeholder="Price" className="border rounded px-2 py-1" />
 
@@ -353,7 +369,7 @@ export default function Admin() {
 
                 <td className="p-3 border">{p.name}</td>
                 <td className="p-3 border">{p.slug}</td>
-                <td className="p-3 border">{p.category}</td>
+                <td className="p-3 border">{p.category?.join(", ")}</td>
 
                 <td className="p-3 border">
 

@@ -5,12 +5,20 @@ import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 
+import { useCart } from "@/src/Context/CartContext";
+import CartModal from "@/src/components/CartModal";
+import CheckoutModal from "@/src/components/CheckoutModal";
+
 import "swiper/css";
 import "swiper/css/pagination";
+import Link from "next/link";
 
 export default function ProductModal({ product, onClose }) {
   const [variant, setVariant] = useState("");
   const [qty, setQty] = useState(1);
+  const { addToCart, cartItems, directBuy } = useCart();
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
 
   useEffect(() => {
     if (!product) return;
@@ -58,7 +66,7 @@ export default function ProductModal({ product, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-end md:items-center">
 
-      <div className="bg-white w-full md:max-w-5xl rounded-t-3xl md:rounded-3xl grid md:grid-cols-2 p-4 md:p-6 relative">
+      <div className="bg-white w-full md:max-w-5xl rounded-t-3xl md:rounded-3xl grid md:grid-cols-2 relative">
 
         <button onClick={onClose} className="absolute right-4 top-4 text-xl text-black">✕</button>
         <div>
@@ -66,41 +74,41 @@ export default function ProductModal({ product, onClose }) {
           <Swiper
             pagination={{ clickable: true }}
             modules={[Pagination]}
-            className="rounded-2xl"
+            className="rounded-2xl w-full"
           >
             {gallery.map((img, i) => (
               <SwiperSlide key={i}>
-                <Image src={img} width={400} height={500} alt="product" className="rounded-2xl mx-auto"/>
+                <Image src={img} width={500} height={500} alt="product" className="w-full md:h-125 rounded-2xl object-cover"/>
               </SwiperSlide>
             ))}
           </Swiper>
         </div>
 
-        <div className="mt-4 md:mt-0 md:pl-6">
+        <div className="mt-4 md:mt-0 md:pl-1 md:p-9">
           {product?.discount && (
             <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm">{product.discount}</span>
           )}
 
-          <h2 className="text-xl md:text-2xl font-bold mt-2 text-black">{product.name}</h2>
+          <h2 className="text-xl md:text-3xl mt-2 font-bold text-black">{product.name}</h2>
 
-          <div className="mt-2">
-            <span className="text-green-700 text-xl font-bold">
+          <div className="mt-4">
+            <span className="text-green-700 text-3xl font-bold">
               Rs. {selectedSize?.price ?? product?.price}.00
             </span>
             {(selectedSize?.oldPrice ?? product?.oldPrice) != null && (
-              <span className="line-through text-gray-400 ml-2">Rs. {selectedSize?.oldPrice ?? product?.oldPrice}.00</span>
+              <span className="line-through text-gray-600 text-2xl ml-2">Rs. {selectedSize?.oldPrice ?? product?.oldPrice}.00</span>
             )}
           </div>
 
-          <p className="text-gray-500 mt-2">Weight: <b>{selectedSize?.size ?? variant}</b></p>
+          <p className="text-gray-700 mt-4">Weight: <b>{selectedSize?.size ?? variant}</b></p>
 
           {isSizeBased && (
-            <div className="flex gap-2 mt-3">
+            <div className="flex gap-2 mt-6">
               {product.sizes.map((s) => (
                 <button
                   key={s.size}
                   onClick={() => setVariant(s.size)}
-                  className={`border px-3 py-2 rounded-lg text-sm text-black ${variant === s.size ? "bg-black text-white" : ""}`}>
+                  className={`border px-5 py-2.5 border-gray-300  text-sm text-black ${variant === s.size ? "bg-black text-white" : ""}`}>
                   {s.size}
                 </button>
               ))}
@@ -109,26 +117,33 @@ export default function ProductModal({ product, onClose }) {
 
           <div className="flex items-center gap-4 mt-5">
 
-            <div className="flex items-center border rounded-full px-4 py-2 text-black">
+            <div className="flex items-center border border-gray-300 bg-gray-50 rounded-full px-6 py-3 text-black">
               <button onClick={decreaseQty}>−</button>
               <span className="mx-3">{qty}</span>
               <button onClick={increaseQty}>+</button>
             </div>
 
-            <button className="bg-gray-800 text-white px-6 py-2 rounded-full">
+            <button onClick={() => { addToCart(product, selectedSize, qty); setIsCartOpen(true); }} className="bg-gray-800 text-white w-full py-4 rounded-full">
               Add to Cart
             </button>
           </div>
 
-          <button className="bg-green-700 text-white w-full py-3 rounded-full mt-4">
+          <button onClick={() => { directBuy(product, selectedSize, qty); setShowCheckout(true); }} className="bg-green-900 text-white w-full py-4 rounded-full mt-4">
             Buy it now
           </button>
-
-          <p className="mt-4 text-sm underline cursor-pointer text-black">
+          <div className="md:pt-15">
+          <Link href={`/shop/${product.slug}`} className="p-3 text-sm font-bold cursor-pointer text-black">
             View Full Details »
-          </p>
+          </Link>
+          </div>
         </div>
       </div>
+      {isCartOpen && (
+        <CartModal cartItems={cartItems} onClose={() => setIsCartOpen(false)} />
+      )}
+      {showCheckout && (
+        <CheckoutModal onClose={() => setShowCheckout(false)} />
+      )}
     </div>
   );
 }

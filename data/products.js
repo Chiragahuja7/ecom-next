@@ -217,3 +217,6 @@ export const allproducts = [
             hoverImg: "https://refineveda.com/cdn/shop/files/Aloeverajuice_37335eab-bc2b-45f5-bd70-b26dd5b56aac.png?v=1767871991&width=720"
         },
     ];
+
+
+export const categories = ["Digestive & Gut Health", "Migraine Relief", "Weight Management", "Vitality Booster", "Immunity & Wellness", "Detox & Cleanse"];

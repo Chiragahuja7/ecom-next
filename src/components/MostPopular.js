@@ -26,7 +26,7 @@ export default function MostPopular(){
             <div className="p-4 w-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 p-3">
 
-            {products.map((item)=>(
+            {products.slice(0,3).map((item)=>(
                 <div key={item.id} className="min-w-full sm:min-w-[60%] md:min-w-0 bg-white rounded-2xl p-3">
 
                 <Link href="" className="block overflow-hidden rounded-xl group relative">

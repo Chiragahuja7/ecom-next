@@ -71,12 +71,16 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  const directBuy =(product,selectedSize,quantity)=>{
+    setCartItems([{ ...product, selectedSize,quantity}]);
+  }
+
   const clearCart = () => {
     setCartItems([]);
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, increaseQty, decreaseQty, clearCart }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, increaseQty, decreaseQty, clearCart, directBuy }}>
       {children}
     </CartContext.Provider>
   );

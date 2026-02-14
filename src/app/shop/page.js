@@ -1,6 +1,6 @@
 'use client';
 import Link from "next/link";
-import { allproducts } from "@/data/products";
+import { allproducts, categories } from "@/data/products";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import ProductModal from "@/src/components/ProductsModal";
@@ -38,7 +38,89 @@ export default function Shop(){
             <span className="text-4xl text-black text-center font-bold">Shop</span>
             </div>
         </div> 
-        <div>
+        <div className="flex text-black p-2">
+            <div className="w-100 p-5 mt-5 hidden md:block">
+                <div>
+                    <details className="group" open>
+                            <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-gray-900">
+                            <span>Shop by Concern</span>
+                            <span className="group-open:hidden text-2xl">+</span>
+                            <span className="hidden group-open:block text-2xl">-</span>
+                            </summary>
+                            
+                            <div className="group-open:animate-fadeIn mt-3 text-gray-600">
+                            {categories.map((category ,index)=>{
+                                return(
+                                <Link key={index} href={`/shop?category=${category.slug}`} className="block py-2 px-3 rounded hover:bg-gray-200">
+                                    {category}
+                                </Link>
+                                )
+                            })}
+                            </div>
+                        </details>
+                </div>
+
+                <div className="mt-6">
+                    <details className="group " open>
+                            <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-gray-900">
+                            <span>Availability</span>
+                            <span className="group-open:hidden text-2xl">+</span>
+                            <span className="hidden group-open:block text-2xl">-</span>
+                            </summary>
+                            
+                            <div className="flex flex-col group-open:animate-fadeIn mt-3 text-gray-600">
+                            <div>
+                            <input type="checkbox" id="inStock" name="inStock" className="mr-2"/>
+                            <label htmlFor="inStock">In Stock</label>
+                            </div>
+                            <div>
+                            <input type="checkbox" id="outOfStock" name="outOfStock" className="mr-2"/>
+                            <label htmlFor="outOfStock">Out Of Stock</label>
+                            </div>
+                            </div>
+                        </details>
+                </div>
+
+                <div className="mt-6">
+                    <details className="group " open>
+                            <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-gray-900">
+                            <span>Price</span>
+                            <span className="group-open:hidden text-2xl">+</span>
+                            <span className="hidden group-open:block text-2xl">-</span>
+                            </summary>
+                            
+                            <div className="flex flex-col group-open:animate-fadeIn mt-3 text-gray-600">
+                            <p>INR</p>
+                            <div className="flex">
+                                <div>
+                                <input type="number" id="minPrice" name="minPrice" className="border w-20 border-gray-300 rounded py-1"/>
+                                </div>
+                                <p className="mx-3">_</p>
+                                <div>
+                            <input type="number" id="maxPrice" name="maxPrice" className=" border w-20 border-gray-300 rounded py-1"/>
+                                </div>
+                            </div>
+                            <div>
+                            <input type="range" name="priceRange" id="priceRange" min="0" max="1000" className="w-full bg-black mt-3"/>
+                            </div>
+                            </div>
+                        </details>
+                </div>
+
+                <div className="mt-6">
+                    <details className="group " open>
+                            <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-gray-900">
+                            <span>Price</span>
+                            <span className="group-open:hidden text-2xl">+</span>
+                            <span className="hidden group-open:block text-2xl">-</span>
+                            </summary>
+                            
+                            
+                            
+                        </details>
+                </div>
+                
+              </div>
 
             <div className="p-4 w-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 p-3">

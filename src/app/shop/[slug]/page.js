@@ -8,6 +8,7 @@ import Image from "next/image";
 import ProductModal from "@/src/components/ProductsModal";
 import { useCart } from "@/src/Context/CartContext";
 import CartModal from "@/src/components/CartModal";
+import CheckoutModal from "@/src/components/CheckoutModal";
 
 export default function Page() {
   const {slug} = useParams();
@@ -20,8 +21,9 @@ export default function Page() {
   const [displayImage, setDisplayImage] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-  const { addToCart, cartItems } = useCart();
+  const { addToCart, cartItems, directBuy } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
   
 
   useEffect(() => {
@@ -206,7 +208,12 @@ export default function Page() {
             }}
             >Add to Cart</button>
           </div>
-          <button className="bg-green-900 mt-2 text-white w-full px-10 py-4 rounded-full">Buy It Now</button>
+          <button className="bg-green-900 mt-2 text-white w-full px-10 py-4 rounded-full"
+          onClick={() => {
+            directBuy(product, selectedSize, quantity);
+            setShowCheckout(true);
+          }}
+          >Buy It Now</button>
 
           <div className="border border-gray-300 md:h-48 mt-6 p-4 rounded-lg">
             <div className="flex gap-2 ms-3 mt-3 font-extralight border-b border-gray-300 pb-3">
@@ -483,6 +490,7 @@ export default function Page() {
     {isCartOpen && (
       <CartModal cartItems={cartItems} onClose={() => setIsCartOpen(false)} />
     )}
+    {showCheckout && <CheckoutModal onClose={() => setShowCheckout(false)} />}
   </div>
   );
 }
