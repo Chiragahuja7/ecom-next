@@ -21,6 +21,14 @@ export default function ProductModal({ product, onClose }) {
   const [showCheckout, setShowCheckout] = useState(false);
 
   useEffect(() => {
+    function handleKey(e) {
+      if (e.key === "Escape") onClose && onClose();
+    }
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  useEffect(() => {
     if (!product) return;
     if (Array.isArray(product.sizes) && product.sizes.length > 0) {
       setVariant((v) => v || product.sizes[0].size);
@@ -64,9 +72,17 @@ export default function ProductModal({ product, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-end md:items-center">
+    <div
+      className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose && onClose();
+      }}
+    >
 
-      <div className="bg-white w-full md:max-w-5xl rounded-t-3xl md:rounded-3xl grid md:grid-cols-2 relative">
+      <div
+        className="bg-white w-full max-w-5xl rounded-3xl grid grid-cols-1 md:grid-cols-2 relative mx-4 md:mx-0 overflow-hidden"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
 
         <button onClick={onClose} className="absolute right-4 top-4 text-xl text-black">✕</button>
         <div>
@@ -74,17 +90,17 @@ export default function ProductModal({ product, onClose }) {
           <Swiper
             pagination={{ clickable: true }}
             modules={[Pagination]}
-            className="rounded-2xl w-full"
+            className="rounded-2xl w-full h-80 md:h-auto"
           >
             {gallery.map((img, i) => (
               <SwiperSlide key={i}>
-                <Image src={img} width={500} height={500} alt="product" className="w-full md:h-125 rounded-2xl object-cover"/>
+                <Image src={img} width={500} height={500} alt="product" className="w-full h-80 md:h-125 rounded-2xl object-cover"/>
               </SwiperSlide>
             ))}
           </Swiper>
         </div>
 
-        <div className="mt-4 md:mt-0 md:pl-1 md:p-9">
+        <div className="p-4 md:pl-1 md:p-9 mt-4 md:mt-0">
           {product?.discount && (
             <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm">{product.discount}</span>
           )}

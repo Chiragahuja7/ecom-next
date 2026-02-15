@@ -35,10 +35,50 @@ export async function POST(req) {
   }
 }
 
-export async function GET() {
+export async function GET(req) {
   await connectDB();
-  const products = await Product.find();
-  return NextResponse.json(products);
+
+  const { searchParams } = new URL(req.url);
+
+  const page = Number(searchParams.get("page")) || 1;
+  const limit = Number(searchParams.get("limit")) || 6;
+  const skip = (page - 1) * limit;
+
+  const query = {};
+
+  // Category
+  const category = searchParams.get("category");
+  if (category) {
+    query.category = new RegExp(category, "i");
+  }
+
+  // Stock
+  const inStock = searchParams.get("inStock");
+  if (inStock === "true") query["sizes.0"] = { $exists: true };
+  if (inStock === "false") query["sizes.0"] = { $exists: false };
+
+  // Price
+  const min = searchParams.get("minPrice");
+  const max = searchParams.get("maxPrice");
+
+  if (min || max) {
+    query["sizes.price"] = {};
+    if (min) query["sizes.price"].$gte = Number(min);
+    if (max) query["sizes.price"].$lte = Number(max);
+  }
+
+  const [products, total] = await Promise.all([
+    Product.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }),
+    Product.countDocuments(query),
+  ]);
+
+  return NextResponse.json({
+    success: true,
+    products,
+    total,
+    page,
+    pages: Math.ceil(total / limit),
+  });
 }
 
 export async function PUT(req) {
