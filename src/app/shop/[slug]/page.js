@@ -1,6 +1,6 @@
 'use client'
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Marquee from "react-fast-marquee";
 import {products} from "@/data/products"
 import Link from "next/link";
@@ -52,21 +52,31 @@ export default function Page() {
   fetchData();
 }, [slug]);
 
-  function imgUrl(item) {
-    if (!item) return null;
-    if (typeof item === 'string') return item;
-    return item.url || item.secure_url || null;
-  }
+const uniqueGallery = useMemo(() => {
+  if (!product) return [];
 
-  const globalImages = Array.isArray(product?.images) ? (product.images || []).map(imgUrl).filter(Boolean) : [];
-  const sizeImages = selectedSize && selectedSize.image && imgUrl(selectedSize.image) ? [imgUrl(selectedSize.image)] : [];
-  const commonImage = (globalImages.length > 1 ? globalImages[1] : globalImages[0]) || null;
-  const remainingGlobals = globalImages.filter((img) => img && img !== commonImage);
-  const gallery = [];
-  if (sizeImages.length > 0) gallery.push(sizeImages[0]);
-  if (commonImage) gallery.push(commonImage, commonImage);
-  gallery.push(...remainingGlobals);
-  const uniqueGallery = Array.from(new Set(gallery.filter(Boolean)));
+  const normalize = (item) => {
+    if (!item) return null;
+    if (typeof item === "string") return item;
+    return item.url || item.secure_url || null;
+  };
+
+  const globals = (product.images || [])
+    .map(normalize)
+    .filter(Boolean);
+
+  const sizeImg = selectedSize?.image
+    ? normalize(selectedSize.image)
+    : null;
+
+  const gallery = [
+    sizeImg,
+    globals[1] || globals[0],
+    ...globals,
+  ].filter(Boolean);
+
+  return Array.from(new Set(gallery));
+}, [product, selectedSize]);
 
  useEffect(() => {
   if (uniqueGallery.length > 0) {

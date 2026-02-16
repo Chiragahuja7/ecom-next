@@ -24,53 +24,53 @@ export default function Shop(){
     const [totalState, setTotalState] = useState(0);
 
     useEffect(() => {
-        const spMin = searchParams?.get("minPrice") || "";
-        const spMax = searchParams?.get("maxPrice") || "";
-        const spRange = searchParams?.get("priceRange") || spMax || "1000";
-        const inStockParam = searchParams?.get("inStock");
+        if (!searchParams) return;
 
-        const spPage = searchParams?.get("page") || "1";
+        const minPrice = searchParams.get("minPrice") || "";
+        const maxPrice = searchParams.get("maxPrice") || "";
+        const priceRange = searchParams.get("priceRange") || maxPrice || "1000";
+        const inStock = searchParams.get("inStock");
+        const page = searchParams.get("page") || "1";
 
-        setMinPriceState(spMin);
-        setMaxPriceState(spMax);
-        setRangeState(Number(spRange));
-        setInStockChecked(inStockParam === "true");
-        setOutOfStockChecked(inStockParam === "false");
-        setPageState(Number(spPage));
+        setMinPriceState(minPrice);
+        setMaxPriceState(maxPrice);
+        setRangeState(Number(priceRange));
+        setInStockChecked(inStock === "true");
+        setOutOfStockChecked(inStock === "false");
+        setPageState(Number(page));
     }, [searchParams]);
 
     const updateQuery = (updates = {}) => {
-        const params = new URLSearchParams(Object.fromEntries(searchParams?.entries() || []));
-        Object.keys(updates).forEach((k) => {
-            const v = updates[k];
-            if (v === null || v === "" || v === undefined) params.delete(k);
-            else params.set(k, String(v));
+        if (!searchParams) return;
+
+        const params = new URLSearchParams(searchParams.toString());
+
+        Object.entries(updates).forEach(([key, value]) => {
+            if (!value) {
+                params.delete(key);
+            } else {
+                params.set(key, value);
+            }
         });
-        if (!updates.hasOwnProperty("page")) params.set("page", "1");
-        const qs = params.toString();
-        router.push(`/shop${qs ? `?${qs}` : ""}`);
+
+        if (!updates.page) {
+            params.set("page", "1");
+        }
+
+        router.push(`/shop?${params.toString()}`);
     };
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const params = new URLSearchParams();
-                const category = searchParams?.get("category");
-                const inStock = searchParams?.get("inStock");
-                const minPrice = searchParams?.get("minPrice");
-                const maxPrice = searchParams?.get("maxPrice");
-                const page = searchParams?.get("page") || "1";
-                const limit = searchParams?.get("limit") || "6";
+                if (!searchParams) return;
 
-                if (category) params.set("category", category);
-                if (inStock) params.set("inStock", inStock);
-                if (minPrice) params.set("minPrice", minPrice);
-                if (maxPrice) params.set("maxPrice", maxPrice);
-                params.set("page", page);
-                params.set("limit", limit);
+                const params = new URLSearchParams(searchParams.toString());
 
-                const url = `/api/products?${params.toString()}`;
-                const response = await fetch(url);
+                if (!params.get("page")) params.set("page", "1");
+                if (!params.get("limit")) params.set("limit", "6");
+
+                const response = await fetch(`/api/products?${params.toString()}`);
 
                 if (!response.ok) {
                     throw new Error("Failed to fetch products");
@@ -79,21 +79,24 @@ export default function Shop(){
                 const data = await response.json();
                 console.log("Fetched products:", data);
 
-                if (data && data.success && Array.isArray(data.products)) {
+                if (data?.success && Array.isArray(data.products)) {
                     setProducts(data.products);
-                    setPageState(Number(data.page) || Number(page));
+                    setPageState(Number(data.page) || 1);
                     setPagesState(Number(data.pages) || 1);
                     setTotalState(Number(data.total) || 0);
-                } else if (Array.isArray(data)) {
+                } 
+                else if (Array.isArray(data)) {
                     setProducts(data);
-                    setPageState(Number(page));
+                    setPageState(1);
                     setPagesState(1);
-                    setTotalState(data.length || 0);
+                    setTotalState(data.length);
                 }
-            } catch (err) {
-                console.error("Error fetching products:", err);
+
+            } catch (error) {
+                console.error("Error fetching products:", error);
             }
         };
+
         fetchProducts();
     }, [searchParams]);
     return(
