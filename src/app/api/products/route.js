@@ -46,18 +46,20 @@ export async function GET(req) {
 
   const query = {};
 
-  // Category
   const category = searchParams.get("category");
   if (category) {
     query.category = new RegExp(category, "i");
   }
 
-  // Stock
+  const q = searchParams.get("q");
+  if (q) {
+    query.name = new RegExp(q, "i");
+  }
+
   const inStock = searchParams.get("inStock");
   if (inStock === "true") query["sizes.0"] = { $exists: true };
   if (inStock === "false") query["sizes.0"] = { $exists: false };
 
-  // Price
   const min = searchParams.get("minPrice");
   const max = searchParams.get("maxPrice");
 
