@@ -6,11 +6,24 @@ import {products} from "@/data/products"
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { Pagination } from 'swiper/modules';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProductModal from "./ProductsModal";
 
 export default function MostPopular(){
    const [selectedProduct, setSelectedProduct] = useState(null);
+       const [products , setProducts]=useState([]);
+       useEffect(()=>{
+           const fetchProducts = async () => {
+           const response = await fetch("/api/products/?sort=MostPopular&limit=3");
+           const data = await response.json();
+           if(!data.success){
+               console.error("Failed to fetch most popular products:", data.error);
+           } else {
+               setProducts(data.products);
+           }
+           }
+           fetchProducts();
+       },[])
 
     return(
         <>
@@ -30,16 +43,16 @@ export default function MostPopular(){
                 <div key={item.id} className="min-w-full sm:min-w-[60%] md:min-w-0 bg-white rounded-2xl p-3">
 
                 <Link href="" className="block overflow-hidden rounded-xl group relative">
-                    <span className="absolute top-3 left-3 bg-red-500 text-white text-sm px-3 py-1 rounded-full z-10">
+                    {/* <span className="absolute top-3 left-3 bg-red-500 text-white text-sm px-3 py-1 rounded-full z-10">
                         {item.discount}
-                    </span>
-                    <Image src={item.img} height={100} width={600} alt={item.name} className="rounded-xl transition-opacity duration-300 group-hover:opacity-0 ease-linear"/>
-                    <Image src={item.hoverImg} height={100} width={600} alt="Hover" className="rounded-xl absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-linear"/>
+                    </span> */}
+                    <Image src={item.images[0].url} height={100} width={600} alt={item.name} className="rounded-xl transition-opacity duration-300 group-hover:opacity-0 ease-linear"/>
+                    <Image src={item.images[1]?.url || item.images[0].url} height={100} width={600} alt="Hover" className="rounded-xl absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-linear"/>
                 </Link>
                 <h3 className="text-black font-semibold mt-3 text-center">{item.name}</h3>
                 <div className="text-center mt-1">
-                    <span className="text-green-700 font-bold">Rs. {item.price}.00</span>
-                    <span className="text-gray-400 line-through ms-2"> Rs. {item.oldPrice}.00</span>
+                    <span className="text-green-700 font-bold">Rs. {item.sizes[0].price}.00</span>
+                    <span className="text-gray-400 line-through ms-2"> Rs. {item.sizes[0].oldPrice}.00</span>
                 </div>
 
                 <button onClick={() => setSelectedProduct(item)}

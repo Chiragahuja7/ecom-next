@@ -249,9 +249,7 @@ export default function Shop(){
                 <div key={item._id} className="min-w-full sm:min-w-[60%] md:min-w-0 bg-white rounded-2xl p-3">
 
                 <Link href={`/shop/${item.slug}`} className="block overflow-hidden rounded-xl group relative">
-                    {/* <span className="absolute top-3 left-3 bg-red-500 text-white text-sm px-3 py-1 rounded-full z-10">
-                        {item.discount}
-                    </span> */}
+                    {/* <span className="absolute top-3 left-3 bg-red-500 text-white text-sm px-3 py-1 rounded-full z-10">{item.discount}</span> */}
                     <Image src={primaryImg} height={100} width={300} alt={item.name} className="rounded-xl transition-opacity duration-300 group-hover:opacity-0 ease-linear w-full h-65 md:h-90"/>
                     <Image src={hoverImg} height={100} width={300} alt="Hover" className="rounded-xl absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-linear w-full h-65 md:h-90"/>
                 </Link>

@@ -85,7 +85,7 @@ const uniqueGallery = useMemo(() => {
   }
 }, [selectedSize, product]);
 
-  if (loading) return <div className="p-9 m-9">Loading...</div>;
+  if (loading) return <div className="p-9 m-9 text-2xl text-black">Loading...</div>;
   if (error) return <div className="p-9 m-9 text-red-600">Error: {error}</div>;
   if (!product) return <div className="p-9 m-9">Product not found</div>;
 
