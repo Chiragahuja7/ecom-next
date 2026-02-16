@@ -152,34 +152,34 @@ export default function CheckoutModal({ onClose }) {
           <span>Subtotal</span>
           <span>Rs.{total}</span>
         </div>
-        <form onSubmit={async (e) => {
+        <form
+          onSubmit={async (e) => {
             e.preventDefault();
+
             try {
               setLoading(true);
-              await submitOrder('pending');
-              alert('Order placed successfully');
-              clearCart();
-              onClose();
+              await handlePayment();
             } catch (err) {
               console.error(err);
-              alert(err.message || 'Failed to place order');
+              alert(err.message || 'Failed to initiate payment');
             } finally {
               setLoading(false);
             }
-        }}>
+          }}
+        >
             <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Name</label>
                 <input value={name} onChange={(e) => setName(e.target.value)} type="text" className="w-full border border-gray-300 rounded px-3 py-2" placeholder="Enter your name" required />
                  <label className="block text-sm font-medium mb-1 mt-2">Email</label>
                 <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" className="w-full border border-gray-300 rounded px-3 py-2" placeholder="Enter your email" required />
                  <label className="block text-sm font-medium mb-1 mt-2">Phone No</label>
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" className="w-full border border-gray-300 rounded px-3 py-2" placeholder="Enter your phone" />
+                <input value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" className="w-full border border-gray-300 rounded px-3 py-2" placeholder="Enter your phone" required />
                  <label className="block text-sm font-medium mb-1 mt-2">Address</label>
                 <input value={address} onChange={(e) => setAddress(e.target.value)} type="text" className="w-full border border-gray-300 rounded px-3 py-2" placeholder="Enter your address" required />
                  <label className="block text-sm font-medium mb-1 mt-2">Pincode</label>
                 <input value={pincode} onChange={(e) => setPincode(e.target.value)} type="text" className="w-full border border-gray-300 rounded px-3 py-2" placeholder="Enter your pincode" required />
             </div>
-            <button onClick={handlePayment} type="submit" disabled={loading || cartItems.length === 0} className="bg-[#444444] text-white w-full px-4 py-3 rounded-full">{loading ? 'Processing...' : 'Submit'}</button>
+            <button type="submit" disabled={loading || cartItems.length === 0} className="bg-[#444444] text-white w-full px-4 py-3 rounded-full">{loading ? 'Processing...' : 'Submit'}</button>
         </form>
 
         {/* <button  disabled={loading || cartItems.length === 0} className="bg-[#444444] mt-3 text-white w-full px-4 py-3 rounded-full">

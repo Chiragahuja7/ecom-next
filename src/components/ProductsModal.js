@@ -71,6 +71,15 @@ export default function ProductModal({ product, onClose }) {
     setQty((prev) => prev - 1);
   }
 
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
+
   return (
     <div
       className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center"

@@ -10,7 +10,7 @@ export default function Header(){
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchText, setSearchText] = useState("");
-  const { addToCart, cartItems } = useCart();
+    const { addToCart, cartItems } = useCart();
     return(
         <header className="bg-[#0f5b3f] p-4">
             <div className="flex justify-between ms-5 mb-4">
@@ -43,8 +43,8 @@ export default function Header(){
                 <ul className="flex justify-left items-center gap-8 mt-4 ms-5">
                     <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/">Home</Link>
                     <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/shop">Shop</Link>
-                    <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/shop">💪HEALTH KITS💪</Link>
-                    <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/shop">Migraine Kit</Link>
+                    <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/shop/jeevan-amrit-complete-health-trio">💪HEALTH KITS💪</Link>
+                    <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/shop/migraine-kit">Migraine Kit</Link>
                     <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/contactus">Contact Us</Link>
                 </ul>
             </nav>
