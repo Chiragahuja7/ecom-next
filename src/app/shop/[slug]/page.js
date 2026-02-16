@@ -122,12 +122,12 @@ const uniqueGallery = useMemo(() => {
       <div className="grid lg:grid-cols-2 grid-cols-1 gap-10 max-w-7xl mx-auto px-4 py-10">
         <div className="flex justify-center mt-6">
           <div className="me-2 mt-1 flex-col gap-3 hidden md:flex">
-              {uniqueGallery.map((img, idx) => (
+              {uniqueGallery.map((img, index) => (
                 <button
-                  key={idx}
-                  onClick={() => { setCurrentIndex(idx); setDisplayImage(img); }}
+                  key={index}
+                  onClick={() => { setCurrentIndex(index); setDisplayImage(img); }}
                   className={`w-15 h-15 rounded border ${displayImage === img ? 'border-black' : 'border-gray-200'}`}>
-                  <img src={img} alt={`thumb-${idx}`} className="w-full h-full object-cover" />
+                  <img src={img} alt={`thumb-${index}`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>

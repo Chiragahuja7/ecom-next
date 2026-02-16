@@ -69,8 +69,32 @@ export async function GET(req) {
     if (max) query["sizes.price"].$lte = Number(max);
   }
 
+  const sortParam = searchParams.get("sort");
+  let sortObj = { createdAt: -1 };
+  if (sortParam) {
+    switch (sortParam) {
+      case "priceLowHigh":
+        sortObj={ "sizes.price": 1 };
+        break;
+      case "priceHighLow":
+        sortObj={ "sizes.price": -1 };
+        break;
+      case "AlphabeticalAZ":
+        sortObj={ name: 1 };
+        break;
+      case "AlphabeticalZA":
+        sortObj={ name: -1 };
+        break;
+      case "BestSeller":
+        sortObj={ createdAt: -1 };
+        break;
+      default:
+        sortObj={ createdAt: -1 };
+    }
+  }
+
   const [products, total] = await Promise.all([
-    Product.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }),
+    Product.find(query).sort(sortObj).skip(skip).limit(limit),
     Product.countDocuments(query),
   ]);
 

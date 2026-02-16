@@ -31,7 +31,7 @@ export default function Header(){
                                             className="w-full text-black outline-none"
                                             placeholder="I am looking for...."
                                         />
-                                        <button onClick={() => { setIsSearchOpen(true); }} className="ms-2 text-sm text-gray-600">Search</button>
+                                        <button onClick={() => { setIsSearchOpen(true); }} className="ms-2 text-sm text-gray-600"></button>
                                 </div>
                 <button onClick={() => setIsCartOpen(true)} className="flex items-center gap-2 text-white">
                     <i className="fa-solid fa-cart-shopping"></i>
@@ -43,19 +43,19 @@ export default function Header(){
                 <ul className="flex justify-left items-center gap-8 mt-4 ms-5">
                     <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/">Home</Link>
                     <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/shop">Shop</Link>
-                    <li className="hover:text-orange-600 hover:underline cursor-pointer">💪HEALTH KITS💪</li>
-                    <li className="hover:text-orange-600 hover:underline cursor-pointer">Migraine Kit</li>
+                    <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/shop">💪HEALTH KITS💪</Link>
+                    <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/shop">Migraine Kit</Link>
                     <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/contactus">Contact Us</Link>
                 </ul>
             </nav>
         {isCartOpen && (
         <CartModal cartItems={cartItems} onClose={() => setIsCartOpen(false)} />
         )}
-                <SearchModal
-                    isOpen={isSearchOpen}
-                    onClose={() => setIsSearchOpen(false)}
-                    searchQuery={searchText}
-                />
+        <SearchModal
+            isOpen={isSearchOpen}
+            onClose={() => setIsSearchOpen(false)}
+            searchQuery={searchText}
+        />
         </header>
 
     )

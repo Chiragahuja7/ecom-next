@@ -101,24 +101,25 @@ export default function Shop(){
     }, [searchParams]);
     return(
         <>
-        <div className="p-9 m-9 text-center">
+        <div className="p-9 m-9 mb-1 text-center">
             <Link href="/" className="text-gray-400">Home</Link>
             <span className="text-black"> : Shop</span>
             <div className="flex items-center justify-center mt-3 gap-3">
             <span className="text-4xl text-black text-center font-bold">Shop</span>
-            <button onClick={()=>setShowFilters(true)} className="md:hidden px-3 py-1 rounded bg-gray-200 text-sm">Filters</button>
             </div>
         </div> 
+         <button onClick={()=>setShowFilters(true)} className="md:hidden ms-10 px-3 py-1 rounded text-black bg-gray-200 text-sm">Filters</button>
+         
         <div className="flex text-black p-2 relative">
             {showFilters && (
                 <div onClick={()=>setShowFilters(false)} className="fixed inset-0 bg-black/40 z-40 md:hidden" />
             )}
 
-            <div className={`${showFilters ? 'fixed left-0 top-0 z-50 h-full w-3/4 bg-white p-5' : 'hidden'} md:block md:w-64 md:relative md:h-auto md:top-auto md:left-auto md:z-auto md:bg-transparent md:p-5 mt-5`}>
-                <div>
+            <div className={`${showFilters ? 'fixed left-0 top-0 z-50 h-full w-3/4 bg-white p-5' : 'hidden'} md:block md:w-64 md:relative md:h-auto md:top-auto md:left-auto md:z-auto md:bg-transparent md:p-5`}>
+                <div className="border-b-gray-200 border border-white">
                     <details className="group" open>
                             <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-gray-900">
-                            <span>Shop by Concern</span>
+                            <span className="text-bold text-xl">Shop by Concern</span>
                             <span className="group-open:hidden text-2xl">+</span>
                             <span className="hidden group-open:block text-2xl">-</span>
                             </summary>
@@ -135,10 +136,10 @@ export default function Shop(){
                         </details>
                 </div>
 
-                <div className="mt-6">
+                <div className="mt-6 border-b-gray-200 border border-white">
                     <details className="group " open>
                             <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-gray-900">
-                            <span>Availability</span>
+                            <span className="text-bold text-xl">Availability</span>
                             <span className="group-open:hidden text-2xl">+</span>
                             <span className="hidden group-open:block text-2xl">-</span>
                             </summary>
@@ -176,10 +177,10 @@ export default function Shop(){
                         </details>
                 </div>
 
-                <div className="mt-6">
+                <div className="mt-6 border-b-gray-200 border border-white">
                     <details className="group " open>
                             <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-gray-900">
-                            <span>Price</span>
+                            <span className="text-bold text-xl">Price</span>
                             <span className="group-open:hidden text-2xl">+</span>
                             <span className="hidden group-open:block text-2xl">-</span>
                             </summary>
@@ -215,22 +216,29 @@ export default function Shop(){
                         </details>
                 </div>
 
-                <div className="mt-6">
+                {/* <div className="mt-6">
                     <details className="group " open>
                             <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-gray-900">
-                            <span>Price</span>
+                            <span className="text-bold text-xl">BestSeller</span>
                             <span className="group-open:hidden text-2xl">+</span>
                             <span className="hidden group-open:block text-2xl">-</span>
                             </summary>
-                            
-                            
-                            
                         </details>
-                </div>
+                </div> */}
                 
-              </div>
+            </div>
 
             <div className="p-4 w-auto">
+            <div className="text-black mb-3 flex items-center justify-end gap-3">
+                <select className="border-gray-200" onChange={(e)=>updateQuery({sort: e.target.value})}>
+                    <option value="">Sort By</option>
+                    <option value="BestSeller">Best Seller</option>
+                    <option value="priceLowHigh">Price: Low to High</option>
+                    <option value="priceHighLow">Price: High to Low</option>
+                    <option value="AlphabeticalAZ">Alphabetical: A-Z</option>
+                    <option value="AlphabeticalZA">Alphabetical: Z-A</option>
+                </select>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 p-3">
 
             {products.map((item)=>{
