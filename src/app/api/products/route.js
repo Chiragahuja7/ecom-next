@@ -148,33 +148,56 @@ export async function DELETE(req) {
     const { id, slug } = body;
 
     if (!id && !slug) {
-      return NextResponse.json({ success: false, error: "Provide id or slug to delete" });
+      return NextResponse.json({
+        success: false,
+        error: "Provide id or slug to delete",
+      });
     }
+
     let product;
     if (id) product = await Product.findById(id);
     else product = await Product.findOne({ slug });
 
     if (!product) {
-      return NextResponse.json({ success: false, error: "Product not found" });
+      return NextResponse.json({
+        success: false,
+        error: "Product not found",
+      });
     }
 
-    if (Array.isArray(product.images) && product.images.length > 0) {
-      await Promise.all(
-        product.images.map((img) => {
-          if (img && img.public_id) {
-            return new Promise((resolve) => {
-              cloudinary.uploader.destroy(img.public_id, () => resolve(true));
-            });
-          }
-          return Promise.resolve(true);
-        })
-      );
+    const publicIds = [];
+
+    if (Array.isArray(product.images)) {
+      product.images.forEach((img) => {
+        if (img?.public_id) publicIds.push(img.public_id);
+      });
     }
+
+    if (Array.isArray(product.sizes)) {
+      product.sizes.forEach((sz) => {
+        if (sz?.image?.public_id) {
+          publicIds.push(sz.image.public_id);
+        }
+      });
+    }
+
+    console.log("Deleting from Cloudinary:", publicIds);
+
+    await Promise.all(
+      publicIds.map(async (id) => {
+        const res = await cloudinary.uploader.destroy(id);
+        console.log(id, res.result);
+      })
+    );
 
     if (id) await Product.findByIdAndDelete(id);
     else await Product.findOneAndDelete({ slug });
+
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message });
+    return NextResponse.json({
+      success: false,
+      error: error.message,
+    });
   }
 }
