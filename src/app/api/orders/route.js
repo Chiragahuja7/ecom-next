@@ -47,3 +47,27 @@ export async function POST(req) {
     return Response.json({ error: "Server Error" }, { status: 500 });
   }
 }
+
+export async function GET(req) {
+  try {
+    await connectDB();
+
+    const url = new URL(req.url);
+    const page = Math.max(1, parseInt(url.searchParams.get("page")) || 1);
+    const limit = Math.max(1, parseInt(url.searchParams.get("limit")) || 10);
+    const skip = (page - 1) * limit;
+
+    const total = await Order.countDocuments();
+    const orders = await Order.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit);
+
+    const totalPages = Math.ceil(total / limit) || 1;
+
+    return Response.json(
+      { success: true, data: orders, meta: { total, page, totalPages, limit } },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error(error);
+    return Response.json({ error: "Server Error" }, { status: 500 });
+  }
+}

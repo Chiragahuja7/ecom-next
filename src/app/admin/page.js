@@ -3,6 +3,7 @@
 import { categories } from "@/data/products";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 
 const Select = dynamic(() => import("react-select"), {
   ssr: false,
@@ -218,6 +219,9 @@ export default function Admin() {
     <h1 className="text-3xl font-bold mb-6">
       Admin Panel
     </h1>
+    <Link href="/admin/orders" className="text-black hover:underline">
+    View Orders
+    </Link>
 
     <div className="bg-white rounded-2xl shadow-md p-6 mb-10">
 
