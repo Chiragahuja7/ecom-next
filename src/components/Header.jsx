@@ -9,54 +9,92 @@ import SearchModal from "./SearchModal";
 export default function Header(){
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [searchText, setSearchText] = useState("");
-    const { addToCart, cartItems } = useCart();
+    const { cartItems } = useCart();
+
     return(
-        <header className="bg-[#0f5b3f] p-4">
-            <div className="flex justify-between ms-5 mb-4">
+        <header className="bg-[#0f5b3f] p-4 relative">
+            <div className="flex justify-between items-center ms-5 mb-4">
+
                 <div className="md:hidden">
-                <i className="fa-solid fa-bars text-2xl"></i>
+                    <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                        <i className="fa-solid fa-bars text-2xl text-white"></i>
+                    </button>
                 </div>
-                <Image src="/assets/refineveda_logo.webp" height={100} width={100} alt="logo" />
-                                <div className="w-170 h-10 bg-white rounded-full hidden gap-1 md:flex items-center px-2">
-                                        <i className="me-2 fa-solid fa-magnifying-glass text-stone-600"></i>
-                                        <input
-                                            value={searchText}
-                                            onChange={(e) => setSearchText(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === "Enter") {
-                                                    setIsSearchOpen(true);
-                                                }
-                                            }}
-                                            className="w-full text-black outline-none"
-                                            placeholder="I am looking for...."
-                                        />
-                                        <button onClick={() => { setIsSearchOpen(true); }} className="ms-2 text-sm text-gray-600"></button>
-                                </div>
-                <button onClick={() => setIsCartOpen(true)} className="flex items-center gap-2 text-white">
-                    <i className="fa-solid fa-cart-shopping"></i>
-                    Cart
-                    <p>({cartItems.length})</p>
-                </button>
+                <Link href="/">
+                    <Image src="/assets/refineveda_logo.webp" height={100} width={100} alt="logo" />
+                </Link>
+
+                <div className="w-170 h-10 bg-white rounded-full hidden gap-1 md:flex items-center px-2">
+                    <i className="me-2 fa-solid fa-magnifying-glass text-stone-600"></i>
+                    <input
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                setIsSearchOpen(true);
+                            }
+                        }}
+                        className="w-full text-black outline-none"
+                        placeholder="I am looking for...."
+                    />
+                </div>
+
+                <div className="flex items-center gap-4 text-white">
+
+                    <button 
+                        className="md:hidden"
+                        onClick={() => setIsSearchOpen(true)}
+                    >
+                        <i className="fa-solid fa-magnifying-glass text-xl"></i>
+                    </button>
+
+                    <button 
+                        onClick={() => setIsCartOpen(true)} 
+                        className="flex items-center gap-2"
+                    >
+                        <i className="fa-solid fa-cart-shopping"></i>
+                        <span className="hidden md:inline">Cart</span>
+                        <p>({cartItems.length})</p>
+                    </button>
+                </div>
             </div>
+
             <nav className="hidden md:flex border-t border-white/20">
-                <ul className="flex justify-left items-center gap-8 mt-4 ms-5">
-                    <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/">Home</Link>
-                    <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/shop">Shop</Link>
-                    <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/shop/jeevan-amrit-complete-health-trio">💪HEALTH KITS💪</Link>
-                    <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/shop/migraine-kit">Migraine Kit</Link>
-                    <Link className="hover:text-orange-600 hover:underline cursor-pointer" href="/contactus">Contact Us</Link>
+                <ul className="flex items-center gap-8 mt-4 ms-5">
+                    <Link className="hover:text-orange-600 hover:underline" href="/">Home</Link>
+                    <Link className="hover:text-orange-600 hover:underline" href="/shop">Shop</Link>
+                    <Link className="hover:text-orange-600 hover:underline" href="/shop/jeevan-amrit-complete-health-trio">💪HEALTH KITS💪</Link>
+                    <Link className="hover:text-orange-600 hover:underline" href="/shop/migraine-kit">Migraine Kit</Link>
+                    <Link className="hover:text-orange-600 hover:underline" href="/contactus">Contact Us</Link>
                 </ul>
             </nav>
-        {isCartOpen && (
-        <CartModal cartItems={cartItems} onClose={() => setIsCartOpen(false)} />
-        )}
-        <SearchModal
-            isOpen={isSearchOpen}
-            onClose={() => setIsSearchOpen(false)}
-            searchQuery={searchText}
-        />
-        </header>
 
+            {isMobileMenuOpen && (
+                <div className="md:hidden bg-white text-black absolute left-0 w-full shadow-lg z-50">
+                    <ul className="flex flex-col p-4 gap-4">
+                        <Link onClick={() => setIsMobileMenuOpen(false)} href="/">Home</Link>
+                        <Link onClick={() => setIsMobileMenuOpen(false)} href="/shop">Shop</Link>
+                        <Link onClick={() => setIsMobileMenuOpen(false)} href="/shop/jeevan-amrit-complete-health-trio">💪HEALTH KITS💪</Link>
+                        <Link onClick={() => setIsMobileMenuOpen(false)} href="/shop/migraine-kit">Migraine Kit</Link>
+                        <Link onClick={() => setIsMobileMenuOpen(false)} href="/contactus">Contact Us</Link>
+                    </ul>
+                </div>
+            )}
+
+            {isCartOpen && (
+                <CartModal 
+                    cartItems={cartItems} 
+                    onClose={() => setIsCartOpen(false)} 
+                />
+            )}
+
+            <SearchModal
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+                searchQuery={searchText}
+            />
+        </header>
     )
 }
