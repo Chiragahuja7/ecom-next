@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 export const CartContext = createContext();
 
@@ -14,7 +14,25 @@ export const useCart =()=>{
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
 
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("cart");
+      if (raw) setCartItems(JSON.parse(raw));
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("cart", JSON.stringify(cartItems));
+    } catch (e) {
+      // ignore
+    }
+  }, [cartItems]);
+
   const addToCart = (product, selectedSize, quantity) => {
+    const qty = quantity ?? 1;
     setCartItems((prevItems) => {
       const existingItem = prevItems.find(
         (item) =>
@@ -26,14 +44,12 @@ export const CartProvider = ({ children }) => {
         return prevItems.map((item) =>
           item._id === product._id &&
           item.selectedSize?.size === selectedSize?.size
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: (item.quantity ?? 0) + qty }
             : item
         );
       }
 
-      return [ ...prevItems,
-        { ...product, selectedSize,quantity},
-      ];
+      return [ ...prevItems, { ...product, selectedSize, quantity: qty } ];
     });
   };
 
@@ -72,7 +88,8 @@ export const CartProvider = ({ children }) => {
   };
 
   const directBuy =(product,selectedSize,quantity)=>{
-    setCartItems([{ ...product, selectedSize,quantity}]);
+    const qty = quantity ?? 1;
+    setCartItems([{ ...product, selectedSize, quantity: qty }]);
   }
 
   const clearCart = () => {

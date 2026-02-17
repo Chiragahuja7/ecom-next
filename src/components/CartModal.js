@@ -1,12 +1,13 @@
 import { useState , useEffect} from "react";
 import { useCart } from "../Context/CartContext";
 import CheckoutModal from "./CheckoutModal";
+import { useRouter } from "next/navigation";
 
 export default function CartModal({ cartItems, onClose }) {
   const { removeFromCart, increaseQty, decreaseQty } = useCart();
   const [show, setShow] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
-  
+  const router = useRouter();
 
 useEffect(() => {
   setTimeout(() => setShow(true), 10);
@@ -27,6 +28,11 @@ useEffect(() => {
     (acc, item) => acc + item.selectedSize.price * item.quantity,
     0
   );
+
+  function handleCartPage(){
+  router.push('/cartpage');
+  onClose();
+  }
 
   return (
     <>
@@ -97,7 +103,7 @@ useEffect(() => {
               <span>Rs.{total}</span>
             </div>
             <div>
-            <button className=" bg-white text-green-950 w-full px-10 py-3 rounded-full">View Cart</button>
+            <button onClick={handleCartPage} className=" bg-white text-green-950 w-full px-10 py-3 rounded-full">View Cart</button>
             <button onClick={() => setShowCheckout(true)} className="bg-[#444444] mt-4 text-white w-full px-10 py-3 rounded-full">Checkout</button>
             </div>
             </div>

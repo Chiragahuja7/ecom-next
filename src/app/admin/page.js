@@ -23,6 +23,8 @@ export default function Admin() {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fileInputKey, setFileInputKey] = useState(Date.now());
+
 
 
   useEffect(() => {
@@ -134,6 +136,16 @@ export default function Admin() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    if (!form.images.length) {
+      alert("At least one image is required");
+      return;
+    }
+
+    if (!form.sizes.length) {
+      alert("At least one size is required");
+      return;
+    }
     setLoading(true);
 
     const payload = {
@@ -165,6 +177,7 @@ export default function Admin() {
 
     setForm(emptyForm);
     setEditingId(null);
+    setFileInputKey(Date.now());
     fetchProducts();
 
     setLoading(false);
@@ -263,11 +276,12 @@ export default function Admin() {
         <div>
           <label className="font-medium">Images</label>
           <input
+            key={fileInputKey}
             type="file"
             multiple
             onChange={handleFiles}
             className="w-full border rounded-lg px-3 py-2 mt-1"
-            required
+            required={!editingId}
           />
 
           <div className="flex gap-3 flex-wrap mt-3">
@@ -289,9 +303,9 @@ export default function Admin() {
 
                 <input name="size" value={sz.size} onChange={(e) => handleSizeChange(idx, e)} placeholder="Size" className="border rounded px-2 py-1" required />
 
-                <input name="price" value={sz.price} onChange={(e) => handleSizeChange(idx, e)} type="number" placeholder="Price" className="border rounded px-2 py-1" />
+                <input name="price" value={sz.price} onChange={(e) => handleSizeChange(idx, e)} type="number" placeholder="Price" className="border rounded px-2 py-1" required />
 
-                <input name="oldPrice" value={sz.oldPrice} onChange={(e) => handleSizeChange(idx, e)} type="number" placeholder="Old Price" className="border rounded px-2 py-1" />
+                <input name="oldPrice" value={sz.oldPrice} onChange={(e) => handleSizeChange(idx, e)} type="number" placeholder="Old Price" className="border rounded px-2 py-1" required/>
 
                 <input type="file" onChange={(e) => handleSizeFile(idx, e)} className="border rounded px-2 py-1" />
 
